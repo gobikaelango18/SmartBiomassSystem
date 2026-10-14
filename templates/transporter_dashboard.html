@@ -1,0 +1,1004 @@
+{% extends "base.html" %}
+
+{% block title %}Transporter Dashboard | GreenRoute{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+
+<style>
+.transport-page{max-width:1400px;margin:0 auto;padding:32px 5%;color:#24372b}
+.transport-header,.section-heading,.stat-top,.vehicle-card,.map-controls{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.transport-header{margin-bottom:22px}
+.transport-header h1{margin:8px 0;font-size:clamp(27px,4vw,38px);letter-spacing:-1px}
+.eyebrow{color:#176b45;font-size:10px;letter-spacing:1.5px;font-weight:800}
+.muted,.section-heading p,.panel-heading p{color:#748278;font-size:12px;line-height:1.8}
+.transport-badge{padding:10px 15px;border-radius:30px;background:#eaf5ec;color:#176b45;font-size:12px;font-weight:700}
+.demo-notice{padding:13px 16px;margin-bottom:22px;border:1px solid #efdca5;border-radius:9px;background:#fff8e4;color:#795a14;font-size:12px;line-height:1.8}
+.transport-notice{display:none;padding:12px 15px;margin-bottom:18px;border-radius:9px;background:#eaf5ec;color:#176b45;font-size:12px;line-height:1.7}
+.transport-notice.error{background:#fff0eb;color:#963f28}
+.transport-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:28px}
+.stat-card,.panel{background:#fff;border:1px solid #e3e9e0;border-radius:13px;box-shadow:0 4px 15px #173d2106}
+.stat-card{padding:20px}
+.stat-label{color:#748278;font-size:12px}
+.stat-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:11px;background:#eaf5ec;font-size:20px}
+.stat-number{margin:13px 0 5px;font-size:28px;font-weight:800;letter-spacing:-1px}
+.stat-note{color:#748278;font-size:11px}
+.transport-section{margin-bottom:28px;scroll-margin-top:90px}
+.section-heading{margin-bottom:15px}
+.section-heading h2{margin:0;font-size:19px}
+.section-heading p{margin:5px 0 0}
+.two-column{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(270px,.8fr);gap:18px}
+.panel{overflow:hidden;box-shadow:none}
+.panel-heading{padding:18px 21px;border-bottom:1px solid #e9eee7}
+.panel-heading h3{margin:0;font-size:15px}
+.panel-heading p{margin:6px 0 0}
+.panel-body,.route-info{padding:21px}
+.vehicle-icon,.route-symbol{display:grid;place-items:center;border-radius:12px;background:#eaf5ec}
+.vehicle-icon{width:58px;height:58px;flex-shrink:0;font-size:29px}
+.vehicle-card{justify-content:flex-start}
+.vehicle-info{flex:1;min-width:0}
+.vehicle-info h3{margin:0 0 5px;font-size:17px}
+.vehicle-info p{margin:0;color:#748278;font-size:12px;line-height:1.8}
+.vehicle-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:21px;padding-top:17px;border-top:1px solid #e9eee7}
+.vehicle-detail span{display:block;color:#748278;font-size:11px;margin-bottom:5px}
+.vehicle-detail strong{font-size:13px}
+.btn{display:inline-flex;justify-content:center;align-items:center;padding:10px 14px;border:1px solid transparent;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn-green{background:#176b45;color:#fff}
+.btn-green:hover{background:#103e2c}
+.btn-light{background:#fff;border-color:#dce5d9;color:#405047}
+.btn-light:hover{background:#f4f7f2}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-small{padding:8px 10px;font-size:11px}
+.search-input{width:260px;max-width:100%;padding:10px 12px;border:1px solid #dce5d9;border-radius:8px;font:inherit;font-size:12px}
+.table-wrap{overflow-x:auto}
+.data-table{width:100%;border-collapse:collapse;white-space:nowrap}
+.data-table th,.data-table td{padding:13px 14px;text-align:left;border-bottom:1px solid #edf0eb;font-size:12px}
+.data-table th{background:#fafbf8;color:#748278;font-weight:700}
+.data-table td{color:#405047}
+.data-table tbody tr:hover{background:#f8fbf7}
+.status{display:inline-block;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.status-green{background:#e5f5e9;color:#207147}
+.status-yellow{background:#fff2d6;color:#88601a}
+.status-blue{background:#e6efff;color:#285baa}
+.status-red{background:#ffede8;color:#954437}
+#trackingMap{width:100%;height:330px;background:#eaf0e7}
+.map-controls{justify-content:flex-start;padding:15px 18px;border-top:1px solid #e9eee7}
+.gps-info{margin-left:auto;color:#748278;font-size:11px;line-height:1.8}
+.gps-info strong{color:#24372b}
+.route-point{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px}
+.route-point:last-child{margin-bottom:0}
+.route-symbol{width:34px;height:34px;flex-shrink:0;font-size:17px}
+.route-point strong{display:block;font-size:12px;margin-bottom:5px}
+.route-point p{margin:0;color:#748278;font-size:11px;line-height:1.7}
+.route-divider{height:18px;border-left:2px dashed #a5c9a8;margin:-12px 0 12px 16px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.field{min-width:0}
+.field.full{grid-column:1/-1}
+.field label{display:block;margin-bottom:7px;font-size:12px;font-weight:700;color:#405047}
+.field input,.field select,.field textarea{box-sizing:border-box;width:100%;padding:11px;border:1px solid #dce5d9;border-radius:8px;color:#24372b;background:#fff;font:inherit;font-size:12px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #d2ead4;border-color:#176b45}
+.form-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px}
+.footer-note{padding:22px 0 5px;text-align:center;color:#748278;font-size:11px}
+@media(max-width:1000px){
+ .transport-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .two-column{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .transport-page{padding:24px 4%}
+ .stat-card{padding:14px}
+ .stat-number{font-size:23px}
+ .form-grid{grid-template-columns:1fr}
+ .field.full,.form-actions{grid-column:auto}
+ .panel-body,.panel-heading,.route-info{padding:16px}
+ .gps-info{margin-left:0;width:100%}
+ #trackingMap{height:280px}
+ .search-input{width:100%}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="transport-page">
+
+  <header class="transport-header">
+    <div>
+      <div class="eyebrow">TRANSPORTER WORKSPACE</div>
+      <h1>Transport Dashboard 🚚</h1>
+      <p class="muted">Manage assigned shipments, update deliveries and monitor the vehicle location.</p>
+    </div>
+    <span class="transport-badge">🌱 GreenRoute Transport Portal</span>
+  </header>
+
+  <div class="demo-notice">
+    <strong>Prototype mode:</strong> This page uses sample shipments held in server memory.
+    Changes made through the Flask API are visible while the server is running, but reset
+    when it restarts. GPS access requires permission and a secure context such as localhost or HTTPS.
+  </div>
+
+  <div id="transportNotice" class="transport-notice" role="status" aria-live="polite"></div>
+
+  <section class="transport-section" id="overview">
+    <div class="section-heading">
+      <div>
+        <h2>Delivery Overview</h2>
+        <p>Summary of your assigned transport activities.</p>
+      </div>
+    </div>
+
+    <div class="transport-stats">
+      <article class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Assigned Shipments</span>
+          <span class="stat-icon">📦</span>
+        </div>
+        <div class="stat-number" id="assignedMetric">—</div>
+        <div class="stat-note">Not yet completed</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Active Trips</span>
+          <span class="stat-icon">🚛</span>
+        </div>
+        <div class="stat-number" id="activeMetric">—</div>
+        <div class="stat-note">Currently in transit</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Delivered Shipments</span>
+          <span class="stat-icon">✅</span>
+        </div>
+        <div class="stat-number" id="deliveredMetric">—</div>
+        <div class="stat-note">From assigned shipments</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">GPS Tracking</span>
+          <span class="stat-icon">📍</span>
+        </div>
+        <div class="stat-number" id="gpsMetric" style="font-size:20px">Inactive</div>
+        <div class="stat-note">Browser location tracking</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="transport-section" id="vehicle">
+    <div class="section-heading">
+      <div>
+        <h2>Assigned Vehicle</h2>
+        <p>Example truck information and load capacity.</p>
+      </div>
+    </div>
+
+    <div class="two-column">
+      <div class="panel">
+        <div class="panel-heading">
+          <h3>Vehicle Information</h3>
+          <p>Sample vehicle assigned to this transporter.</p>
+        </div>
+
+        <div class="panel-body">
+          <div class="vehicle-card">
+            <div class="vehicle-icon">🚚</div>
+            <div class="vehicle-info">
+              <h3>TN-37-AB-1234</h3>
+              <p>Biomass transport truck · Sample registration</p>
+            </div>
+            <span class="status status-green">Available</span>
+          </div>
+
+          <div class="vehicle-details">
+            <div class="vehicle-detail">
+              <span>Payload capacity</span>
+              <strong>20 tons</strong>
+            </div>
+            <div class="vehicle-detail">
+              <span>Transporter ID</span>
+              <strong id="transporterIdLabel">TR-1001</strong>
+            </div>
+            <div class="vehicle-detail">
+              <span>Selected shipment</span>
+              <strong id="vehicleShipmentLabel">None selected</strong>
+            </div>
+            <div class="vehicle-detail">
+              <span>GPS source</span>
+              <strong id="gpsSourceLabel">Not connected</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <div class="panel-heading">
+          <h3>Driver Checklist</h3>
+          <p>Before starting a delivery.</p>
+        </div>
+
+        <div class="route-info">
+          <div class="route-point">
+            <div class="route-symbol">📋</div>
+            <div>
+              <strong>Verify shipment manifest</strong>
+              <p>Confirm shipment ID, material type and authorized load.</p>
+            </div>
+          </div>
+
+          <div class="route-divider"></div>
+
+          <div class="route-point">
+            <div class="route-symbol">⚖️</div>
+            <div>
+              <strong>Check the vehicle load</strong>
+              <p>Respect vehicle payload and applicable axle-load restrictions.</p>
+            </div>
+          </div>
+
+          <div class="route-divider"></div>
+
+          <div class="route-point">
+            <div class="route-symbol">📍</div>
+            <div>
+              <strong>Enable tracking when authorized</strong>
+              <p>Start location sharing before departure, with permission.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="transport-section" id="shipments">
+    <div class="section-heading">
+      <div>
+        <h2>Assigned Shipments</h2>
+        <p>Progress through pickup, transit and delivery confirmation.</p>
+      </div>
+      <input id="shipmentSearch" class="search-input" type="search"
+             placeholder="Search shipment or destination...">
+    </div>
+
+    <div class="panel">
+      <div class="table-wrap">
+        <table class="data-table" id="shipmentTable">
+          <thead>
+            <tr>
+              <th>Shipment</th>
+              <th>Pickup</th>
+              <th>Destination</th>
+              <th>Load</th>
+              <th>Deadline</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="shipmentBody">
+            <tr><td colspan="7">Loading shipments…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="transport-section" id="tracking">
+    <div class="section-heading">
+      <div>
+        <h2>GPS Truck Tracking</h2>
+        <p>View current browser location on the map and submit it to the demo API.</p>
+      </div>
+      <span class="status status-yellow" id="trackingStatus">Tracking not started</span>
+    </div>
+
+    <div class="two-column">
+      <div class="panel">
+        <div class="panel-heading">
+          <h3>Truck Location Map</h3>
+          <p>Your location is used only after you grant browser permission.</p>
+        </div>
+
+        <div id="trackingMap" aria-label="Truck location map"></div>
+
+        <div class="map-controls">
+          <button class="btn btn-green" id="startGps" type="button">
+            Start GPS Tracking
+          </button>
+          <button class="btn btn-light" id="stopGps" type="button" disabled>
+            Stop Tracking
+          </button>
+
+          <div class="gps-info">
+            Latitude: <strong id="latitude">Not available</strong><br>
+            Longitude: <strong id="longitude">Not available</strong><br>
+            Accuracy: <strong id="gpsAccuracy">Not available</strong><br>
+            Last update: <strong id="lastUpdate">Not available</strong>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <div class="panel-heading">
+          <h3>Tracking Details</h3>
+          <p>Choose a shipment to associate with GPS readings.</p>
+        </div>
+
+        <div class="panel-body">
+          <div class="field">
+            <label for="gpsShipment">Shipment ID (optional)</label>
+            <select id="gpsShipment">
+              <option value="">No shipment selected</option>
+            </select>
+          </div>
+
+          <div class="route-point" style="margin-top:20px">
+            <div class="route-symbol">🏬</div>
+            <div>
+              <strong>Pickup location</strong>
+              <p id="selectedPickup">Select a shipment to view its pickup location.</p>
+            </div>
+          </div>
+
+          <div class="route-divider"></div>
+
+          <div class="route-point">
+            <div class="route-symbol">🏭</div>
+            <div>
+              <strong>Delivery destination</strong>
+              <p id="selectedDestination">Select a shipment to view its destination.</p>
+            </div>
+          </div>
+
+          <div class="route-divider"></div>
+
+          <div class="route-point">
+            <div class="route-symbol">🛰️</div>
+            <div>
+              <strong>Tracking information</strong>
+              <p id="trackingDescription">No location has been recorded in this session.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="transport-section" id="delivery">
+    <div class="section-heading">
+      <div>
+        <h2>Delivery Confirmation</h2>
+        <p>Record recipient and delivered quantity once the shipment reaches its destination.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-heading">
+        <h3>Delivery Receipt</h3>
+        <p>Submitting the form updates the demo Flask API and shipment status.</p>
+      </div>
+
+      <div class="panel-body">
+        <form id="deliveryForm" class="form-grid">
+          <div class="field">
+            <label for="deliveryShipment">Shipment ID</label>
+            <select id="deliveryShipment" required>
+              <option value="">Select an in-transit shipment</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="deliveredQuantity">Delivered quantity (tons)</label>
+            <input id="deliveredQuantity" type="number" min="0.1" step="0.1"
+                   required placeholder="e.g. 18">
+          </div>
+
+          <div class="field">
+            <label for="receiverName">Recipient name</label>
+            <input id="receiverName" required maxlength="100"
+                   placeholder="Person receiving the shipment">
+          </div>
+
+          <div class="field">
+            <label for="deliveryTime">Delivery date and time</label>
+            <input id="deliveryTime" type="datetime-local" required>
+          </div>
+
+          <div class="field full">
+            <label for="deliveryNotes">Delivery notes</label>
+            <textarea id="deliveryNotes" rows="3" maxlength="800"
+                      placeholder="Quantity difference, unloading details or observations..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-green" id="recordDeliveryButton">
+              Record Delivery
+            </button>
+            <button type="reset" class="btn btn-light">Clear Form</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="transport-section" id="history">
+    <div class="section-heading">
+      <div>
+        <h2>Delivery History</h2>
+        <p>Receipt records returned by the demo API.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Shipment</th>
+              <th>Delivered Tons</th>
+              <th>Received By</th>
+              <th>Date / Time</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="deliveryHistory">
+            <tr><td colspan="5">Loading delivery history…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-note">
+    GreenRoute · Transporter Workspace · Smart Biomass Supply Chain
+  </footer>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+
+  const TRANSPORTER_ID = "TR-1001";
+  const notice = document.getElementById("transportNotice");
+  const shipmentBody = document.getElementById("shipmentBody");
+  const searchInput = document.getElementById("shipmentSearch");
+  const deliveryForm = document.getElementById("deliveryForm");
+  const deliveryHistory = document.getElementById("deliveryHistory");
+  const gpsShipment = document.getElementById("gpsShipment");
+
+  let shipments = [];
+  let map = null;
+  let truckMarker = null;
+  let accuracyCircle = null;
+  let watchId = null;
+
+  function showNotice(message, isError) {
+    notice.textContent = message;
+    notice.className = "transport-notice" + (isError ? " error" : "");
+    notice.style.display = "block";
+  }
+
+  async function requestJSON(url, options) {
+    const response = await fetch(url, options || {});
+    let data;
+
+    try {
+      data = await response.json();
+    } catch (_) {
+      throw new Error("The server returned an unreadable response.");
+    }
+
+    if (!response.ok || data.success === false) {
+      throw new Error(data.error || "The request failed. Please try again.");
+    }
+
+    return data;
+  }
+
+  function makeCell(value) {
+    const td = document.createElement("td");
+    td.textContent = value == null || value === "" ? "—" : String(value);
+    return td;
+  }
+
+  function statusClass(status) {
+    if (status === "Delivered") return "status-green";
+    if (status === "In Transit") return "status-blue";
+    if (status === "Cancelled") return "status-red";
+    return "status-yellow";
+  }
+
+  function nextAction(shipment) {
+    if (shipment.status === "Assigned") {
+      return { label: "Confirm Pickup", next: "Picked Up" };
+    }
+    if (shipment.status === "Picked Up") {
+      return { label: "Start Trip", next: "In Transit" };
+    }
+    if (shipment.status === "In Transit") {
+      return { label: "Record Delivery", next: null };
+    }
+    return {
+      label: shipment.status === "Delivered" ? "Completed" : "No action",
+      next: null
+    };
+  }
+
+  function renderShipments() {
+    const query = searchInput.value.trim().toLowerCase();
+    shipmentBody.replaceChildren();
+
+    const visible = shipments.filter(shipment =>
+      [
+        shipment.shipment_id,
+        shipment.pickup,
+        shipment.destination,
+        shipment.status
+      ].join(" ").toLowerCase().includes(query)
+    );
+
+    if (!visible.length) {
+      const tr = document.createElement("tr");
+      const td = makeCell(
+        shipments.length ? "No shipments match your search." : "No shipments assigned."
+      );
+      td.colSpan = 7;
+      tr.appendChild(td);
+      shipmentBody.appendChild(tr);
+      return;
+    }
+
+    visible.forEach(shipment => {
+      const tr = document.createElement("tr");
+      tr.dataset.id = shipment.shipment_id;
+
+      tr.appendChild(makeCell(shipment.shipment_id));
+      tr.appendChild(makeCell(shipment.pickup));
+      tr.appendChild(makeCell(shipment.destination));
+      tr.appendChild(makeCell(Number(shipment.quantity_tons).toFixed(1) + " tons"));
+      tr.appendChild(makeCell(shipment.deadline));
+
+      const statusCell = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "status " + statusClass(shipment.status);
+      badge.textContent = shipment.status;
+      statusCell.appendChild(badge);
+      tr.appendChild(statusCell);
+
+      const actionCell = document.createElement("td");
+      const actionInfo = nextAction(shipment);
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "btn btn-small shipment-action " +
+        (actionInfo.next ? "btn-green" : "btn-light");
+      button.textContent = actionInfo.label;
+      button.disabled = !actionInfo.next && shipment.status !== "In Transit";
+
+      button.addEventListener("click", async function () {
+        if (shipment.status === "In Transit") {
+          document.getElementById("deliveryShipment").value = shipment.shipment_id;
+          document.getElementById("deliveredQuantity").value = shipment.quantity_tons;
+          document.getElementById("delivery").scrollIntoView({ behavior: "smooth" });
+          showNotice(
+            "Complete the delivery receipt below for " + shipment.shipment_id + ".",
+            false
+          );
+          return;
+        }
+
+        try {
+          button.disabled = true;
+
+          await requestJSON(
+            "/transporter/api/shipments/" +
+            encodeURIComponent(shipment.shipment_id) + "/status",
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ status: actionInfo.next })
+            }
+          );
+
+          showNotice(
+            shipment.shipment_id + " updated to " + actionInfo.next + ".",
+            false
+          );
+
+          await loadDashboard();
+        } catch (error) {
+          showNotice(error.message, true);
+          button.disabled = false;
+        }
+      });
+
+      actionCell.appendChild(button);
+      tr.appendChild(actionCell);
+      shipmentBody.appendChild(tr);
+    });
+  }
+
+  function populateShipmentSelects() {
+    const previousGps = gpsShipment.value;
+    const previousDelivery = document.getElementById("deliveryShipment").value;
+
+    gpsShipment.replaceChildren(new Option("No shipment selected", ""));
+
+    const deliverySelect = document.getElementById("deliveryShipment");
+    deliverySelect.replaceChildren(new Option("Select an in-transit shipment", ""));
+
+    shipments.forEach(shipment => {
+      gpsShipment.add(new Option(shipment.shipment_id, shipment.shipment_id));
+
+      if (shipment.status === "In Transit") {
+        deliverySelect.add(new Option(shipment.shipment_id, shipment.shipment_id));
+      }
+    });
+
+    if (shipments.some(s => s.shipment_id === previousGps)) {
+      gpsShipment.value = previousGps;
+    }
+
+    if (shipments.some(
+      s => s.shipment_id === previousDelivery && s.status === "In Transit"
+    )) {
+      deliverySelect.value = previousDelivery;
+    }
+
+    updateSelectedRoute();
+  }
+
+  function updateSelectedRoute() {
+    const chosen = shipments.find(s => s.shipment_id === gpsShipment.value);
+
+    document.getElementById("selectedPickup").textContent =
+      chosen ? chosen.pickup : "Select a shipment to view its pickup location.";
+
+    document.getElementById("selectedDestination").textContent =
+      chosen ? chosen.destination : "Select a shipment to view its destination.";
+
+    document.getElementById("vehicleShipmentLabel").textContent =
+      chosen ? chosen.shipment_id : "None selected";
+  }
+
+  async function loadSummary() {
+    const data = await requestJSON(
+      "/transporter/api/summary?transporter_id=" +
+      encodeURIComponent(TRANSPORTER_ID)
+    );
+
+    const summary = data.summary;
+    document.getElementById("assignedMetric").textContent =
+      summary.assigned_shipments;
+    document.getElementById("activeMetric").textContent =
+      summary.active_trips;
+    document.getElementById("deliveredMetric").textContent =
+      summary.delivered_shipments;
+    document.getElementById("transporterIdLabel").textContent =
+      summary.transporter_id;
+  }
+
+  async function loadShipments() {
+    const data = await requestJSON(
+      "/transporter/api/shipments?transporter_id=" +
+      encodeURIComponent(TRANSPORTER_ID)
+    );
+
+    shipments = data.shipments || [];
+    renderShipments();
+    populateShipmentSelects();
+  }
+
+  async function loadDeliveryHistory() {
+    const data = await requestJSON("/transporter/api/deliveries");
+    deliveryHistory.replaceChildren();
+
+    const list = (data.deliveries || []).filter(item =>
+      shipments.some(s => s.shipment_id === item.shipment_id)
+    );
+
+    if (!list.length) {
+      const row = document.createElement("tr");
+      const cell = makeCell("No delivery records yet.");
+      cell.colSpan = 5;
+      row.appendChild(cell);
+      deliveryHistory.appendChild(row);
+      return;
+    }
+
+    list.slice().reverse().forEach(item => {
+      const row = document.createElement("tr");
+
+      [
+        item.shipment_id,
+        Number(item.delivered_tons).toFixed(1) + " t",
+        item.receiver_name,
+        (item.delivered_at || "").replace("T", " "),
+        item.notes || "No notes"
+      ].forEach(value => row.appendChild(makeCell(value)));
+
+      deliveryHistory.appendChild(row);
+    });
+  }
+
+  async function loadDashboard() {
+    try {
+      await loadShipments();
+      await Promise.all([loadSummary(), loadDeliveryHistory()]);
+    } catch (error) {
+      showNotice(
+        error.message +
+        " Make sure Flask is running and the transporter routes are registered.",
+        true
+      );
+    }
+  }
+
+  function setLocalDateTime() {
+    const now = new Date();
+    const local = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60000
+    ).toISOString().slice(0, 16);
+
+    document.getElementById("deliveryTime").value = local;
+  }
+
+  deliveryForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    if (!deliveryForm.reportValidity()) return;
+
+    const shipmentId = document.getElementById("deliveryShipment").value;
+    const quantity = Number(
+      document.getElementById("deliveredQuantity").value
+    );
+    const receiver = document.getElementById("receiverName").value.trim();
+    const deliveredAt = document.getElementById("deliveryTime").value;
+    const notes = document.getElementById("deliveryNotes").value.trim();
+
+    const shipment = shipments.find(s => s.shipment_id === shipmentId);
+
+    if (!shipment || shipment.status !== "In Transit") {
+      showNotice("Select a valid in-transit shipment.", true);
+      return;
+    }
+
+    if (
+      !Number.isFinite(quantity) ||
+      quantity <= 0 ||
+      quantity > Number(shipment.quantity_tons)
+    ) {
+      showNotice(
+        "Enter a positive quantity that does not exceed the manifest quantity.",
+        true
+      );
+      return;
+    }
+
+    if (!receiver) {
+      showNotice("Enter the recipient name.", true);
+      return;
+    }
+
+    const button = document.getElementById("recordDeliveryButton");
+    button.disabled = true;
+
+    try {
+      await requestJSON(
+        "/transporter/api/shipments/" +
+        encodeURIComponent(shipmentId) + "/delivery",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            delivered_tons: quantity,
+            receiver_name: receiver,
+            delivered_at: deliveredAt,
+            notes: notes
+          })
+        }
+      );
+
+      showNotice(
+        "Delivery receipt saved to the demo Flask API for " + shipmentId + ".",
+        false
+      );
+
+      deliveryForm.reset();
+      setLocalDateTime();
+      await loadDashboard();
+    } catch (error) {
+      showNotice(error.message, true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  function initialiseMap() {
+    const mapElement = document.getElementById("trackingMap");
+
+    if (!window.L) {
+      mapElement.textContent =
+        "Map could not load. Check your internet connection and refresh.";
+      mapElement.style.padding = "20px";
+      return;
+    }
+
+    map = window.L.map(mapElement).setView([11.0168, 76.9558], 10);
+
+    window.L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+      }
+    ).addTo(map);
+
+    window.L.marker([11.0168, 76.9558])
+      .addTo(map)
+      .bindPopup("Demonstration map center: Coimbatore");
+
+    setTimeout(() => map.invalidateSize(), 250);
+  }
+
+  function setTrackingStatus(message, className) {
+    const badge = document.getElementById("trackingStatus");
+    badge.className = "status " + className;
+    badge.textContent = message;
+  }
+
+  function stopTracking(silent) {
+    if (watchId !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(watchId);
+    }
+
+    watchId = null;
+    document.getElementById("startGps").disabled = false;
+    document.getElementById("stopGps").disabled = true;
+    document.getElementById("gpsMetric").textContent = "Inactive";
+
+    setTrackingStatus("Tracking stopped", "status-yellow");
+
+    if (!silent) {
+      showNotice("GPS tracking stopped.", false);
+    }
+  }
+
+  async function sendLocationToServer(latitude, longitude, accuracy) {
+    const payload = {
+      transporter_id: TRANSPORTER_ID,
+      shipment_id: gpsShipment.value,
+      latitude: latitude,
+      longitude: longitude,
+      accuracy: accuracy
+    };
+
+    try {
+      await requestJSON("/transporter/api/location", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      document.getElementById("trackingDescription").textContent =
+        "Latest location submitted to the demo Flask API.";
+    } catch (error) {
+      document.getElementById("trackingDescription").textContent =
+        "Location shown in this browser; server update failed: " + error.message;
+    }
+  }
+
+  function startTracking() {
+    if (!navigator.geolocation) {
+      showNotice("This browser does not support geolocation.", true);
+      return;
+    }
+
+    if (!window.isSecureContext) {
+      showNotice(
+        "GPS requires HTTPS or localhost. Open this page through your Flask localhost URL.",
+        true
+      );
+      return;
+    }
+
+    if (watchId !== null) return;
+
+    document.getElementById("startGps").disabled = true;
+    document.getElementById("stopGps").disabled = false;
+
+    setTrackingStatus("Waiting for location", "status-blue");
+    showNotice(
+      "Allow location permission in the browser to start GPS tracking.",
+      false
+    );
+
+    watchId = navigator.geolocation.watchPosition(
+      async function (position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+
+        document.getElementById("latitude").textContent = lat.toFixed(6);
+        document.getElementById("longitude").textContent = lng.toFixed(6);
+        document.getElementById("gpsAccuracy").textContent =
+          Math.round(accuracy) + " metres";
+        document.getElementById("lastUpdate").textContent =
+          new Date(position.timestamp).toLocaleTimeString();
+        document.getElementById("gpsMetric").textContent = "Active";
+        document.getElementById("gpsSourceLabel").textContent = "Browser GPS";
+
+        setTrackingStatus("Location received", "status-green");
+
+        const point = [lat, lng];
+
+        if (map) {
+          if (!truckMarker) {
+            truckMarker = window.L.marker(point)
+              .addTo(map)
+              .bindPopup("Current browser location");
+          } else {
+            truckMarker.setLatLng(point);
+          }
+
+          if (!accuracyCircle) {
+            accuracyCircle = window.L.circle(point, {
+              radius: accuracy,
+              color: "#176b45",
+              fillOpacity: 0.12
+            }).addTo(map);
+          } else {
+            accuracyCircle.setLatLng(point);
+            accuracyCircle.setRadius(accuracy);
+          }
+
+          map.setView(point, 15);
+        }
+
+        await sendLocationToServer(lat, lng, accuracy);
+      },
+      function (error) {
+        let message = "Could not retrieve the location.";
+
+        if (error.code === 1) {
+          message = "Location permission was denied. Allow location access and try again.";
+        } else if (error.code === 2) {
+          message = "Your current position is unavailable. Check device location settings.";
+        } else if (error.code === 3) {
+          message = "The location request timed out. Try again.";
+        }
+
+        stopTracking(true);
+        setTrackingStatus("Location unavailable", "status-red");
+        showNotice(message, true);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 20000
+      }
+    );
+  }
+
+  document.getElementById("startGps").addEventListener("click", startTracking);
+  document.getElementById("stopGps").addEventListener("click", () => stopTracking(false));
+  searchInput.addEventListener("input", renderShipments);
+  gpsShipment.addEventListener("change", updateSelectedRoute);
+
+  deliveryForm.addEventListener("reset", function () {
+    setTimeout(setLocalDateTime, 0);
+  });
+
+  setLocalDateTime();
+  initialiseMap();
+  loadDashboard();
+
+  window.addEventListener("pagehide", function () {
+    if (watchId !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(watchId);
+    }
+  });
+});
+</script>
+{% endblock %}

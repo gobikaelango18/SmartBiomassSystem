@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+
+{% block title %}Login | GreenRoute{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-page {
+        min-height: 680px;
+        padding: 55px 6%;
+        display: grid;
+        grid-template-columns: 1fr 0.85fr;
+        align-items: center;
+        gap: 60px;
+        background:
+            radial-gradient(ellipse at 10% 10%, #e2f2df 0%, transparent 45%),
+            #f6f8f1;
+    }
+
+    .login-intro {
+        max-width: 620px;
+    }
+
+    .login-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px 13px;
+        color: #176b45;
+        background: #e8f5e7;
+        border: 1px solid #d6ead1;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 10px;
+        letter-spacing: 1.5px;
+    }
+
+    .login-intro h1 {
+        font-size: clamp(38px, 5vw, 59px);
+        line-height: 1.12;
+        letter-spacing: -2.5px;
+        margin: 25px 0 18px;
+        color: #103e2c;
+    }
+
+    .login-intro h1 span {
+        color: #176b45;
+    }
+
+    .login-intro > p {
+        color: #718077;
+        line-height: 1.9;
+        font-size: 14px;
+        max-width: 500px;
+    }
+
+    .login-benefits {
+        display: grid;
+        gap: 16px;
+        margin-top: 30px;
+    }
+
+    .benefit {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .benefit-icon {
+        display: grid;
+        place-items: center;
+        width: 43px;
+        height: 43px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: white;
+        border: 1px solid #e1eade;
+        font-size: 21px;
+    }
+
+    .benefit strong {
+        display: block;
+        font-size: 13px;
+        color: #24372b;
+    }
+
+    .benefit small {
+        display: block;
+        margin-top: 4px;
+        color: #718077;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 470px;
+        justify-self: center;
+        padding: 35px;
+        background: white;
+        border: 1px solid #e3e9e0;
+        border-radius: 19px;
+        box-shadow: 0 22px 60px #173d2110;
+    }
+
+    .card-brand {
+        display: grid;
+        place-items: center;
+        width: 53px;
+        height: 53px;
+        border-radius: 15px;
+        background: #eaf5ec;
+        font-size: 28px;
+        margin-bottom: 22px;
+    }
+
+    .login-card h2 {
+        margin: 0 0 8px;
+        font-size: 27px;
+        letter-spacing: -0.8px;
+        color: #103e2c;
+    }
+
+    .intro-text {
+        margin: 0 0 25px;
+        color: #718077;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .login-field {
+        margin-bottom: 19px;
+    }
+
+    .login-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #344a3a;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .login-field input {
+        width: 100%;
+        min-width: 0;
+        padding: 13px 14px;
+        border: 1px solid #dce5d9;
+        border-radius: 9px;
+        background: white;
+        color: #24372b;
+        font: inherit;
+        font-size: 13px;
+        outline: none;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    .login-field input:focus {
+        border-color: #176b45;
+        box-shadow: 0 0 0 3px #176b4514;
+    }
+
+    .password-wrap {
+        position: relative;
+    }
+
+    .password-wrap input {
+        padding-right: 76px;
+    }
+
+    .show-password {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: #176b45;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .login-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 1px 0 22px;
+    }
+
+    .remember-option {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #718077;
+        font-size: 11px;
+    }
+
+    .remember-option input {
+        accent-color: #176b45;
+        width: auto;
+    }
+
+    .login-help {
+        color: #718077;
+        font-size: 11px;
+    }
+
+    .login-submit {
+        width: 100%;
+        padding: 14px;
+        border: 0;
+        border-radius: 9px;
+        background: #176b45;
+        color: white;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background .2s, transform .2s;
+    }
+
+    .login-submit:hover {
+        background: #103e2c;
+        transform: translateY(-1px);
+    }
+
+    .login-submit:disabled {
+        opacity: .7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .login-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 23px 0;
+        color: #89958b;
+        font-size: 10px;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+        content: "";
+        height: 1px;
+        flex: 1;
+        background: #e8ede5;
+    }
+
+    .register-text {
+        text-align: center;
+        color: #718077;
+        font-size: 12px;
+    }
+
+    .register-text a {
+        color: #176b45;
+        font-weight: 800;
+    }
+
+    .login-security {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-top: 22px;
+        padding: 12px;
+        background: #f5f8f2;
+        border-radius: 9px;
+        color: #718077;
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    .login-security span {
+        font-size: 16px;
+    }
+
+    .login-bottom {
+        margin-top: 19px;
+        color: #89958b;
+        text-align: center;
+        font-size: 10px;
+    }
+
+    @media (max-width: 900px) {
+        .login-page {
+            grid-template-columns: 1fr;
+            gap: 35px;
+            padding: 40px 5%;
+        }
+
+        .login-intro {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .login-card {
+            max-width: 560px;
+        }
+
+        .login-intro h1 {
+            font-size: 43px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-page {
+            padding: 30px 4%;
+        }
+
+        .login-intro h1 {
+            font-size: 36px;
+            letter-spacing: -1.5px;
+        }
+
+        .login-card {
+            padding: 24px 19px;
+        }
+
+        .login-card h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<main class="login-page">
+
+    <section class="login-intro">
+        <div class="login-eyebrow">
+            <span>●</span>
+            YOUR BIOMASS NETWORK
+        </div>
+
+        <h1>
+            One platform.<br>
+            A <span>greener future.</span>
+        </h1>
+
+        <p>
+            Welcome back to GreenRoute. Manage agricultural residue,
+            coordinate collection, optimize biomass transportation,
+            and connect fuel supply with industrial demand.
+        </p>
+
+        <div class="login-benefits">
+            <div class="benefit">
+                <div class="benefit-icon">🌾</div>
+                <div>
+                    <strong>Connected Agricultural Supply</strong>
+                    <small>
+                        Organize farmer availability and collection schedules.
+                    </small>
+                </div>
+            </div>
+
+            <div class="benefit">
+                <div class="benefit-icon">🚚</div>
+                <div>
+                    <strong>Smarter Procurement and Logistics</strong>
+                    <small>
+                        Coordinate inventory, shipments and delivery planning.
+                    </small>
+                </div>
+            </div>
+
+            <div class="benefit">
+                <div class="benefit-icon">🌱</div>
+                <div>
+                    <strong>Informed Fuel Decisions</strong>
+                    <small>
+                        Monitor quality, costs and supply-chain performance.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="login-card">
+        <div class="card-brand">🌱</div>
+
+        <h2>Welcome Back</h2>
+
+        <p class="intro-text">
+            Sign in with your registered account to access your workspace.
+        </p>
+
+        <form method="POST" action="/login" id="loginForm">
+
+            <div class="login-field">
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    autocomplete="username"
+                    placeholder="you@example.com"
+                    maxlength="254"
+                    required>
+            </div>
+
+            <div class="login-field">
+                <label for="password">Password</label>
+
+                <div class="password-wrap">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
+                        required>
+
+                    <button
+                        type="button"
+                        class="show-password"
+                        id="togglePassword"
+                        aria-controls="password"
+                        aria-pressed="false">
+                        Show
+                    </button>
+                </div>
+            </div>
+
+            <div class="login-options">
+                <label class="remember-option">
+                    <input type="checkbox" name="remember" value="yes">
+                    Remember me
+                </label>
+
+                <span class="login-help">
+                    Need help? Contact your administrator.
+                </span>
+            </div>
+
+            <button type="submit" class="login-submit" id="loginSubmit">
+                Sign In to GreenRoute →
+            </button>
+
+        </form>
+
+        <div class="login-divider">NEW TO GREENROUTE?</div>
+
+        <p class="register-text">
+            Don't have an account?
+            <a href="/register">Create an account</a>
+        </p>
+
+        <div class="login-security">
+            <span>🔒</span>
+            <div>
+                Your account should use secure password hashing and
+                role-based access. After successful authentication,
+                Flask should redirect you to the dashboard matching
+                your registered role.
+            </div>
+        </div>
+
+        <div class="login-bottom">
+            GreenRoute · Smart Biomass Procurement & Logistics
+        </div>
+    </section>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const password = document.getElementById("password");
+    const toggle = document.getElementById("togglePassword");
+    const loginForm = document.getElementById("loginForm");
+    const submitButton = document.getElementById("loginSubmit");
+
+    toggle.addEventListener("click", function () {
+        const visible = password.type === "password";
+
+        password.type = visible ? "text" : "password";
+        toggle.textContent = visible ? "Hide" : "Show";
+        toggle.setAttribute("aria-pressed", String(visible));
+    });
+
+    loginForm.addEventListener("submit", function () {
+        if (!loginForm.checkValidity()) {
+            return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Signing in...";
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1529 @@
+{% extends "base.html" %}
+
+{% block title %}Pellet Plant Dashboard | GreenRoute{% endblock %}
+
+{% block extra_css %}
+<style>
+    .plant-page {
+        max-width: 1350px;
+        margin: auto;
+        padding: 32px 5%;
+        color: #24372b;
+    }
+
+    .plant-header, .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .plant-header h1 {
+        margin: 8px 0;
+        color: #103e2c;
+        font-size: clamp(26px, 4vw, 38px);
+    }
+
+    .eyebrow {
+        color: #176b45;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+    }
+
+    .muted, .section-heading p {
+        color: #748278;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .plant-badge {
+        padding: 10px 15px;
+        border-radius: 30px;
+        background: #eaf5ec;
+        color: #176b45;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .demo-notice {
+        padding: 13px 16px;
+        margin-bottom: 25px;
+        border: 1px solid #efdca5;
+        border-radius: 9px;
+        background: #fff8e4;
+        color: #795a14;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .notice {
+        display: none;
+        margin-bottom: 20px;
+        padding: 12px 15px;
+        background: #eaf5ec;
+        color: #176b45;
+        border-radius: 9px;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .notice.error {
+        background: #fff0eb;
+        color: #963f28;
+    }
+
+    .plant-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        padding: 20px;
+        background: white;
+        border: 1px solid #e3e9e0;
+        border-radius: 13px;
+        box-shadow: 0 4px 15px #173d2106;
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .stat-label {
+        color: #748278;
+        font-size: 12px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: #eaf5ec;
+        font-size: 21px;
+    }
+
+    .stat-value {
+        margin: 13px 0 5px;
+        font-size: 26px;
+        font-weight: 800;
+        color: #103e2c;
+        overflow-wrap: anywhere;
+    }
+
+    .stat-note {
+        color: #748278;
+        font-size: 11px;
+    }
+
+    .plant-section {
+        margin-bottom: 30px;
+        scroll-margin-top: 95px;
+    }
+
+    .section-heading {
+        margin-bottom: 15px;
+    }
+
+    .section-heading h2 {
+        margin: 0;
+        font-size: 19px;
+        color: #103e2c;
+    }
+
+    .section-heading p {
+        margin: 5px 0 0;
+    }
+
+    .panel {
+        background: white;
+        border: 1px solid #e3e9e0;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .panel-heading {
+        padding: 20px 23px;
+        border-bottom: 1px solid #e9eee7;
+    }
+
+    .panel-heading h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #103e2c;
+    }
+
+    .panel-heading p {
+        margin: 6px 0 0;
+        color: #748278;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .panel-body {
+        padding: 23px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+    .field {
+        min-width: 0;
+    }
+
+    .field.full {
+        grid-column: 1 / -1;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 7px;
+        color: #405047;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .field input,
+    .field select,
+    .field textarea,
+    .search-input {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #dce5d9;
+        border-radius: 8px;
+        color: #24372b;
+        background: white;
+        font-family: inherit;
+        font-size: 12px;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus,
+    .search-input:focus {
+        outline: 2px solid #d2ead4;
+        border-color: #176b45;
+    }
+
+    .field small {
+        display: block;
+        margin-top: 6px;
+        color: #748278;
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .form-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .btn-green {
+        background: #176b45;
+        color: white;
+    }
+
+    .btn-green:hover {
+        background: #103e2c;
+    }
+
+    .btn-light {
+        background: white;
+        border-color: #dce5d9;
+        color: #405047;
+    }
+
+    .btn:disabled {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    .two-column {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(270px, .8fr);
+        gap: 18px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 13px 15px;
+        text-align: left;
+        border-bottom: 1px solid #edf0eb;
+        font-size: 12px;
+    }
+
+    .data-table th {
+        background: #fafbf8;
+        color: #748278;
+        font-weight: 700;
+    }
+
+    .data-table tbody tr:hover {
+        background: #f8fbf7;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .status-green {
+        background: #e5f5e9;
+        color: #207147;
+    }
+
+    .status-yellow {
+        background: #fff2d6;
+        color: #88601a;
+    }
+
+    .status-blue {
+        background: #e6efff;
+        color: #285baa;
+    }
+
+    .status-red {
+        background: #ffede8;
+        color: #954437;
+    }
+
+    .capacity-list {
+        padding: 20px;
+    }
+
+    .capacity-item {
+        margin-bottom: 23px;
+    }
+
+    .capacity-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .capacity-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 9px;
+        font-size: 12px;
+    }
+
+    .capacity-title span {
+        color: #748278;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 20px;
+        background: #e9eee7;
+        overflow: hidden;
+    }
+
+    .progress-inner {
+        height: 100%;
+        background: #4c9668;
+        border-radius: inherit;
+        transition: width .25s;
+    }
+
+    .info-card {
+        padding: 19px;
+        background: #eaf5ec;
+        border: 1px solid #d7ead7;
+        border-radius: 12px;
+    }
+
+    .info-card h3 {
+        margin: 0 0 9px;
+        font-size: 14px;
+    }
+
+    .info-card p,
+    .info-card li {
+        color: #617367;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .info-card ul {
+        padding-left: 18px;
+        margin-top: 10px;
+    }
+
+    .search-input {
+        width: 240px;
+        max-width: 100%;
+    }
+
+    .footer-note {
+        padding: 25px 0 5px;
+        color: #748278;
+        text-align: center;
+        font-size: 11px;
+    }
+
+    @media (max-width: 1000px) {
+        .plant-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .two-column {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .plant-page {
+            padding: 25px 4%;
+        }
+
+        .stat-card {
+            padding: 14px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .field.full,
+        .form-actions {
+            grid-column: 1 / -1;
+        }
+
+        .panel-body,
+        .panel-heading {
+            padding: 17px;
+        }
+
+        .search-input {
+            width: 100%;
+        }
+    }
+
+    @media print {
+        .no-print,
+        form,
+        .demo-notice {
+            display: none !important;
+        }
+
+        .plant-page {
+            max-width: 100%;
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<main class="plant-page">
+
+    <header class="plant-header">
+        <div>
+            <div class="eyebrow">PELLET PLANT WORKSPACE</div>
+            <h1>Production Dashboard ⚙️</h1>
+            <p class="muted">
+                Manage raw materials, pellet production, quality inspections and dispatches.
+            </p>
+        </div>
+
+        <span class="plant-badge">🌱 GreenRoute Plant Portal</span>
+
+        <button type="button" class="btn btn-light no-print"
+                onclick="window.print()">
+            Print Dashboard
+        </button>
+    </header>
+
+    <div class="demo-notice">
+        <strong>Prototype mode:</strong>
+        This dashboard saves demonstration data in this browser.
+        Records are not yet shared with other users or stored in your Flask database.
+    </div>
+
+    <div id="plantNotice" class="notice" role="status"
+         aria-live="polite"></div>
+
+    <!-- SUMMARY -->
+    <section id="overview" class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Plant Overview</h2>
+                <p>Review raw stock, finished pellets, production and quality.</p>
+            </div>
+        </div>
+
+        <div class="plant-stats">
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Raw Material Stock</span>
+                    <span class="stat-icon">🌾</span>
+                </div>
+                <div class="stat-value" id="rawStock">180.0 t</div>
+                <div class="stat-note">Agricultural residue available</div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Finished Pellets</span>
+                    <span class="stat-icon">🟢</span>
+                </div>
+                <div class="stat-value" id="pelletStock">120.0 t</div>
+                <div class="stat-note">Undispatched finished stock</div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Production Today</span>
+                    <span class="stat-icon">⚙️</span>
+                </div>
+                <div class="stat-value" id="productionToday">0.0 t</div>
+                <div class="stat-note">Output recorded for today</div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Quality Passed</span>
+                    <span class="stat-icon">🧪</span>
+                </div>
+                <div class="stat-value" id="qualityPassed">1 / 2</div>
+                <div class="stat-note">Latest inspection status by batch</div>
+            </article>
+        </div>
+    </section>
+
+    <!-- INVENTORY -->
+    <section id="inventory" class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Raw Material and Storage</h2>
+                <p>Monitor available stock against configured capacity.</p>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>Inventory Overview</h3>
+                    <p>Demonstration capacities</p>
+                </div>
+
+                <div class="capacity-list">
+                    <div class="capacity-item">
+                        <div class="capacity-title">
+                            <strong>Raw residue storage</strong>
+                            <span id="rawCapacityLabel">180 / 300 tons</span>
+                        </div>
+                        <div class="progress">
+                            <div id="rawProgress" class="progress-inner"
+                                 style="width:60%"></div>
+                        </div>
+                    </div>
+
+                    <div class="capacity-item">
+                        <div class="capacity-title">
+                            <strong>Finished-pellet storage</strong>
+                            <span id="pelletCapacityLabel">120 / 250 tons</span>
+                        </div>
+                        <div class="progress">
+                            <div id="pelletProgress" class="progress-inner"
+                                 style="width:48%"></div>
+                        </div>
+                    </div>
+
+                    <div class="capacity-item">
+                        <div class="capacity-title">
+                            <strong>Daily production capacity</strong>
+                            <span id="dailyCapacityLabel">0 / 100 tons</span>
+                        </div>
+                        <div class="progress">
+                            <div id="productionProgress" class="progress-inner"
+                                 style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="info-card">
+                <h3>🏭 Production Rules</h3>
+                <p>Raw residue and finished pellets must be tracked separately.</p>
+                <ul>
+                    <li>Raw storage capacity: 300 tons.</li>
+                    <li>Finished stock capacity: 250 tons.</li>
+                    <li>Daily production limit: 100 tons of output.</li>
+                    <li>Actual pellet output is recorded separately from raw input.</li>
+                    <li>Only quality-passed batches can be dispatched.</li>
+                </ul>
+            </aside>
+        </div>
+    </section>
+
+    <!-- PRODUCTION FORM -->
+    <section id="production" class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Record Production Batch</h2>
+                <p>Enter the amount of raw material used and pellets actually produced.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h3>New Production Batch</h3>
+                <p>Production output must not exceed raw input.</p>
+            </div>
+
+            <div class="panel-body">
+                <form id="productionForm" class="form-grid">
+
+                    <div class="field">
+                        <label for="batchDate">Production Date</label>
+                        <input id="batchDate" type="date" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="batchResidue">Raw Material Type</label>
+                        <select id="batchResidue" required>
+                            <option value="">Select residue type</option>
+                            <option>Rice straw</option>
+                            <option>Wheat straw</option>
+                            <option>Sugarcane residue</option>
+                            <option>Cotton stalks</option>
+                            <option>Mixed agricultural residue</option>
+                            <option>Other crop residue</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="rawInput">Raw Residue Input (tons)</label>
+                        <input id="rawInput" type="number" min="0.1"
+                               max="300" step="0.1" required placeholder="e.g. 20">
+                    </div>
+
+                    <div class="field">
+                        <label for="pelletOutput">Pellets Produced (tons)</label>
+                        <input id="pelletOutput" type="number" min="0.1"
+                               step="0.1" required placeholder="e.g. 16">
+                        <small>Must not exceed raw input or remaining storage capacity.</small>
+                    </div>
+
+                    <div class="field full">
+                        <label for="batchNotes">Production Notes</label>
+                        <textarea id="batchNotes" rows="2" maxlength="500"
+                                  placeholder="Batch observations or material losses"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-green">
+                            + Record Production
+                        </button>
+                        <button type="reset" class="btn btn-light">
+                            Clear Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- BATCH HISTORY -->
+    <section id="batches" class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Production Batch History</h2>
+                <p>Review raw input, pellet output, yield and quality status.</p>
+            </div>
+            <input id="batchSearch" class="search-input no-print"
+                   type="search" aria-label="Search production batches"
+                   placeholder="Search batches...">
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Batch ID</th>
+                            <th>Date</th>
+                            <th>Residue Type</th>
+                            <th>Raw Input</th>
+                            <th>Pellet Output</th>
+                            <th>Yield</th>
+                            <th>Remaining</th>
+                            <th>Quality Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batchBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUALITY INSPECTION -->
+    <section id="quality" class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Fuel Quality and Moisture Compliance</h2>
+                <p>Compare measured values with the buyer's acceptance limits.</p>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>Inspect a Pellet Batch</h3>
+                    <p>The entered measurements determine the demonstration result.</p>
+                </div>
+
+                <div class="panel-body">
+                    <form id="qualityForm" class="form-grid">
+
+                        <div class="field">
+                            <label for="qualityBatch">Batch ID</label>
+                            <select id="qualityBatch" required></select>
+                        </div>
+
+                        <div class="field">
+                            <label for="testDate">Test Date</label>
+                            <input id="testDate" type="date" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="moisture">Measured Moisture (%)</label>
+                            <input id="moisture" type="number" min="0"
+                                   max="100" step="0.1" required value="12">
+                        </div>
+
+                        <div class="field">
+                            <label for="gcv">Measured GCV (kcal/kg)</label>
+                            <input id="gcv" type="number" min="0"
+                                   step="1" required value="3800">
+                        </div>
+
+                        <div class="field">
+                            <label for="ash">Measured Ash (%)</label>
+                            <input id="ash" type="number" min="0"
+                                   max="100" step="0.1" required value="5">
+                        </div>
+
+                        <div class="field">
+                            <label for="maxMoisture">Buyer Max Moisture (%)</label>
+                            <input id="maxMoisture" type="number" min="0"
+                                   max="100" step="0.1" required value="14">
+                        </div>
+
+                        <div class="field">
+                            <label for="minGcv">Buyer Min GCV (kcal/kg)</label>
+                            <input id="minGcv" type="number" min="0"
+                                   step="1" required value="3500">
+                        </div>
+
+                        <div class="field">
+                            <label for="maxAsh">Buyer Max Ash (%)</label>
+                            <input id="maxAsh" type="number" min="0"
+                                   max="100" step="0.1" required value="10">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-green">
+                                Check and Record Quality
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <aside class="info-card">
+                <h3>✅ Quality Assessment</h3>
+                <p>A batch passes only when all three measured parameters satisfy the entered limits.</p>
+                <ul>
+                    <li>Moisture must not exceed the specified maximum.</li>
+                    <li>GCV must meet or exceed the specified minimum.</li>
+                    <li>Ash content must not exceed the specified maximum.</li>
+                </ul>
+                <p>
+                    These are input-based checks, not verified laboratory results.
+                    Use the actual buyer specification for a real order.
+                </p>
+            </aside>
+        </div>
+    </section>
+
+    <!-- QUALITY HISTORY -->
+    <section class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Quality Inspection Records</h2>
+                <p>Review every recorded inspection.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Batch ID</th>
+                            <th>Test Date</th>
+                            <th>Moisture</th>
+                            <th>GCV</th>
+                            <th>Ash</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qualityBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- DISPATCH -->
+    <section id="dispatch" class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Pellet Dispatch Management</h2>
+                <p>Record finished pellets sent to an industrial buyer.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h3>Create Dispatch Record</h3>
+                <p>Dispatch is allowed only from quality-passed batches.</p>
+            </div>
+
+            <div class="panel-body">
+                <form id="dispatchForm" class="form-grid">
+
+                    <div class="field">
+                        <label for="dispatchBuyer">Industrial Buyer</label>
+                        <input id="dispatchBuyer" required maxlength="120"
+                               placeholder="e.g. ABC Industries">
+                    </div>
+
+                    <div class="field">
+                        <label for="dispatchDestination">Delivery Destination</label>
+                        <input id="dispatchDestination" required maxlength="160"
+                               placeholder="Factory location">
+                    </div>
+
+                    <div class="field">
+                        <label for="dispatchBatch">Quality-Passed Batch</label>
+                        <select id="dispatchBatch" required></select>
+                        <small>Only passed batches with stock are available.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="dispatchQuantity">Dispatch Quantity (tons)</label>
+                        <input id="dispatchQuantity" type="number"
+                               min="0.1" step="0.1" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="truckNumber">Truck Registration</label>
+                        <input id="truckNumber" required maxlength="30"
+                               placeholder="e.g. TN-37-AB-1234">
+                    </div>
+
+                    <div class="field">
+                        <label for="dispatchDate">Dispatch Date</label>
+                        <input id="dispatchDate" type="date" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-green">
+                            Record Pellet Dispatch
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- DISPATCH HISTORY -->
+    <section class="plant-section">
+        <div class="section-heading">
+            <div>
+                <h2>Dispatch History</h2>
+                <p>Track recorded movement of finished pellets.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Dispatch ID</th>
+                            <th>Date</th>
+                            <th>Buyer</th>
+                            <th>Batch</th>
+                            <th>Quantity</th>
+                            <th>Truck</th>
+                            <th>Destination</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dispatchBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-note">
+        GreenRoute · Pellet Plant Management · Smart Biomass Supply Chain
+    </footer>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const STORAGE_KEY = "greenroute_plant_dashboard_v2";
+
+    const rawCapacity = 300;
+    const pelletCapacity = 250;
+    const dailyProductionCapacity = 100;
+
+    function todayString() {
+        const now = new Date();
+        return [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0")
+        ].join("-");
+    }
+
+    function createInitialState() {
+        return {
+            rawStock: 180,
+            dailyDate: todayString(),
+            productionToday: 0,
+            nextBatch: 1003,
+            nextDispatch: 1001,
+
+            batches: [
+                {
+                    id: "BAT-1001",
+                    date: "2026-10-12",
+                    residue: "Rice straw",
+                    input: 100,
+                    output: 80,
+                    remaining: 80,
+                    notes: "Sample historic batch",
+                    qualityStatus: "Passed"
+                },
+                {
+                    id: "BAT-1002",
+                    date: "2026-10-13",
+                    residue: "Sugarcane residue",
+                    input: 50,
+                    output: 40,
+                    remaining: 40,
+                    notes: "Sample historic batch",
+                    qualityStatus: "Failed"
+                }
+            ],
+
+            inspections: [
+                {
+                    batchId: "BAT-1001",
+                    date: "2026-10-12",
+                    moisture: 12,
+                    gcv: 3800,
+                    ash: 5,
+                    result: "Passed"
+                },
+                {
+                    batchId: "BAT-1002",
+                    date: "2026-10-13",
+                    moisture: 18,
+                    gcv: 3400,
+                    ash: 12,
+                    result: "Failed"
+                }
+            ],
+
+            dispatches: []
+        };
+    }
+
+    function loadData() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+
+            if (!saved) return createInitialState();
+
+            const parsed = JSON.parse(saved);
+
+            if (
+                !Array.isArray(parsed.batches) ||
+                !Array.isArray(parsed.inspections) ||
+                !Array.isArray(parsed.dispatches) ||
+                !Number.isFinite(parsed.rawStock)
+            ) {
+                return createInitialState();
+            }
+
+            return parsed;
+        } catch (error) {
+            return createInitialState();
+        }
+    }
+
+    let state = loadData();
+
+    function saveData() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            return true;
+        } catch (error) {
+            showNotice("Browser storage could not save the data.", true);
+            return false;
+        }
+    }
+
+    function ensureToday() {
+        const today = todayString();
+
+        if (state.dailyDate !== today) {
+            state.dailyDate = today;
+            state.productionToday = 0;
+        }
+    }
+
+    const notice = document.getElementById("plantNotice");
+
+    function showNotice(message, error = false) {
+        notice.textContent = message;
+        notice.className = error ? "notice error" : "notice";
+        notice.style.display = "block";
+    }
+
+    function formatTons(value) {
+        return Number(value).toFixed(1) + " t";
+    }
+
+    function formatNumber(value) {
+        return Number(value).toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        });
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    function pelletStockTotal() {
+        return state.batches.reduce(
+            (sum, batch) => sum + batch.remaining, 0
+        );
+    }
+
+    function statusClass(status) {
+        if (status === "Passed" || status === "Dispatched") {
+            return "status-green";
+        }
+
+        if (status === "Failed") {
+            return "status-red";
+        }
+
+        if (status === "Not Inspected") {
+            return "status-yellow";
+        }
+
+        return "status-blue";
+    }
+
+    function statusBadge(status) {
+        return `<span class="status ${statusClass(status)}">${escapeHTML(status)}</span>`;
+    }
+
+    function cell(value) {
+        const td = document.createElement("td");
+        td.textContent = value;
+        return td;
+    }
+
+    function updateInventory() {
+        ensureToday();
+
+        const pelletStock = pelletStockTotal();
+
+        document.getElementById("rawStock").textContent =
+            formatTons(state.rawStock);
+
+        document.getElementById("pelletStock").textContent =
+            formatTons(pelletStock);
+
+        document.getElementById("productionToday").textContent =
+            formatTons(state.productionToday);
+
+        document.getElementById("rawCapacityLabel").textContent =
+            `${formatNumber(state.rawStock)} / ${rawCapacity} tons`;
+
+        document.getElementById("pelletCapacityLabel").textContent =
+            `${formatNumber(pelletStock)} / ${pelletCapacity} tons`;
+
+        document.getElementById("dailyCapacityLabel").textContent =
+            `${formatNumber(state.productionToday)} / ${dailyProductionCapacity} tons`;
+
+        document.getElementById("rawProgress").style.width =
+            Math.min(state.rawStock / rawCapacity * 100, 100) + "%";
+
+        document.getElementById("pelletProgress").style.width =
+            Math.min(pelletStock / pelletCapacity * 100, 100) + "%";
+
+        document.getElementById("productionProgress").style.width =
+            Math.min(state.productionToday / dailyProductionCapacity * 100, 100) + "%";
+
+        const passed = state.batches.filter(
+            batch => batch.qualityStatus === "Passed"
+        ).length;
+
+        document.getElementById("qualityPassed").textContent =
+            `${passed} / ${state.batches.length}`;
+    }
+
+    function renderBatches() {
+        const body = document.getElementById("batchBody");
+
+        body.innerHTML = state.batches.map(batch => {
+            const yieldPercent = batch.input > 0
+                ? batch.output / batch.input * 100
+                : 0;
+
+            return `
+                <tr>
+                    <td>${escapeHTML(batch.id)}</td>
+                    <td>${escapeHTML(batch.date)}</td>
+                    <td>${escapeHTML(batch.residue)}</td>
+                    <td>${formatTons(batch.input)}</td>
+                    <td>${formatTons(batch.output)}</td>
+                    <td>${yieldPercent.toFixed(1)}%</td>
+                    <td>${formatTons(batch.remaining)}</td>
+                    <td>${statusBadge(batch.qualityStatus)}</td>
+                </tr>
+            `;
+        }).join("");
+
+        applyBatchSearch();
+    }
+
+    function renderQuality() {
+        const body = document.getElementById("qualityBody");
+
+        if (state.inspections.length === 0) {
+            body.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        No quality inspections recorded.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        body.innerHTML = [...state.inspections].reverse().map(record => `
+            <tr>
+                <td>${escapeHTML(record.batchId)}</td>
+                <td>${escapeHTML(record.date)}</td>
+                <td>${Number(record.moisture).toFixed(1)}%</td>
+                <td>${formatNumber(record.gcv)}</td>
+                <td>${Number(record.ash).toFixed(1)}%</td>
+                <td>${statusBadge(record.result)}</td>
+            </tr>
+        `).join("");
+    }
+
+    function renderBatchSelectors() {
+        const qualitySelect = document.getElementById("qualityBatch");
+        const previousQuality = qualitySelect.value;
+
+        qualitySelect.innerHTML = state.batches.length
+            ? state.batches.map(batch => `
+                <option value="${escapeHTML(batch.id)}">
+                    ${escapeHTML(batch.id)} — ${escapeHTML(batch.residue)}
+                </option>
+            `).join("")
+            : '<option value="">No batches available</option>';
+
+        if (state.batches.some(batch => batch.id === previousQuality)) {
+            qualitySelect.value = previousQuality;
+        }
+
+        const dispatchSelect = document.getElementById("dispatchBatch");
+        const previousDispatch = dispatchSelect.value;
+
+        const eligible = state.batches.filter(batch =>
+            batch.qualityStatus === "Passed" && batch.remaining > 0
+        );
+
+        dispatchSelect.innerHTML = eligible.length
+            ? eligible.map(batch => `
+                <option value="${escapeHTML(batch.id)}">
+                    ${escapeHTML(batch.id)} — ${escapeHTML(batch.residue)}
+                    — ${formatTons(batch.remaining)} available
+                </option>
+            `).join("")
+            : '<option value="">No eligible quality-passed batches</option>';
+
+        if (eligible.some(batch => batch.id === previousDispatch)) {
+            dispatchSelect.value = previousDispatch;
+        }
+
+        document.getElementById("dispatchQuantity").max =
+            eligible.length
+                ? String(eligible.find(batch =>
+                    batch.id === dispatchSelect.value
+                )?.remaining ?? 0)
+                : "0";
+    }
+
+    function renderDispatches() {
+        const body = document.getElementById("dispatchBody");
+
+        if (state.dispatches.length === 0) {
+            body.innerHTML = `
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        No dispatch records yet.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        body.innerHTML = [...state.dispatches].reverse().map(dispatch => `
+            <tr>
+                <td>${escapeHTML(dispatch.id)}</td>
+                <td>${escapeHTML(dispatch.date)}</td>
+                <td>${escapeHTML(dispatch.buyer)}</td>
+                <td>${escapeHTML(dispatch.batchId)}</td>
+                <td>${formatTons(dispatch.quantity)}</td>
+                <td>${escapeHTML(dispatch.truck)}</td>
+                <td>${escapeHTML(dispatch.destination)}</td>
+                <td>${statusBadge("Dispatched")}</td>
+            </tr>
+        `).join("");
+    }
+
+    function renderAll() {
+        updateInventory();
+        renderBatches();
+        renderQuality();
+        renderBatchSelectors();
+        renderDispatches();
+        saveData();
+    }
+
+    // PRODUCTION
+    document.getElementById("productionForm").addEventListener(
+        "submit", function (event) {
+            event.preventDefault();
+
+            if (!this.reportValidity()) return;
+
+            ensureToday();
+
+            const date = document.getElementById("batchDate").value;
+            const input = Number(document.getElementById("rawInput").value);
+            const output = Number(document.getElementById("pelletOutput").value);
+            const residue = document.getElementById("batchResidue").value;
+            const notes = document.getElementById("batchNotes").value.trim();
+
+            if (!date || date !== todayString()) {
+                showNotice("Record new production using today's date.", true);
+                return;
+            }
+
+            if (!Number.isFinite(input) || !Number.isFinite(output) ||
+                input <= 0 || output <= 0 || output > input) {
+                showNotice(
+                    "Enter positive quantities. Pellet output cannot exceed raw input.",
+                    true
+                );
+                return;
+            }
+
+            if (!residue) {
+                showNotice("Select the raw residue type.", true);
+                return;
+            }
+
+            if (input > state.rawStock) {
+                showNotice("Insufficient raw residue stock.", true);
+                return;
+            }
+
+            if (state.productionToday + output > dailyProductionCapacity) {
+                showNotice("This batch exceeds the remaining daily output capacity.", true);
+                return;
+            }
+
+            if (pelletStockTotal() + output > pelletCapacity) {
+                showNotice("Finished-pellet storage capacity would be exceeded.", true);
+                return;
+            }
+
+            const id = "BAT-" + state.nextBatch++;
+
+            const batch = {
+                id,
+                date,
+                residue,
+                input,
+                output,
+                remaining: output,
+                notes,
+                qualityStatus: "Not Inspected"
+            };
+
+            state.rawStock -= input;
+            state.productionToday += output;
+            state.batches.push(batch);
+
+            this.reset();
+            renderAll();
+
+            showNotice(
+                `${id} recorded. Raw stock decreased by ${formatTons(input)}; ` +
+                `finished stock increased by ${formatTons(output)}.`
+            );
+        }
+    );
+
+    // QUALITY INSPECTION
+    document.getElementById("qualityForm").addEventListener(
+        "submit", function (event) {
+            event.preventDefault();
+
+            if (!this.reportValidity()) return;
+
+            const id = document.getElementById("qualityBatch").value;
+            const batch = state.batches.find(item => item.id === id);
+            const date = document.getElementById("testDate").value;
+
+            const moisture = Number(document.getElementById("moisture").value);
+            const gcv = Number(document.getElementById("gcv").value);
+            const ash = Number(document.getElementById("ash").value);
+            const maxMoisture = Number(document.getElementById("maxMoisture").value);
+            const minGcv = Number(document.getElementById("minGcv").value);
+            const maxAsh = Number(document.getElementById("maxAsh").value);
+
+            if (!batch) {
+                showNotice("Select a valid production batch.", true);
+                return;
+            }
+
+            if ([moisture, gcv, ash, maxMoisture, minGcv, maxAsh]
+                .some(value => !Number.isFinite(value) || value < 0) ||
+                moisture > 100 || ash > 100 ||
+                maxMoisture > 100 || maxAsh > 100) {
+                showNotice("Check the quality measurements and limits.", true);
+                return;
+            }
+
+            if (!date || date > todayString()) {
+                showNotice("Enter a valid test date that is not in the future.", true);
+                return;
+            }
+
+            const passed =
+                moisture <= maxMoisture &&
+                gcv >= minGcv &&
+                ash <= maxAsh;
+
+            batch.qualityStatus = passed ? "Passed" : "Failed";
+
+            state.inspections.push({
+                batchId: id,
+                date,
+                moisture,
+                gcv,
+                ash,
+                result: passed ? "Passed" : "Failed"
+            });
+
+            this.reset();
+            document.getElementById("testDate").value = todayString();
+            document.getElementById("maxMoisture").value = "14";
+            document.getElementById("minGcv").value = "3500";
+            document.getElementById("maxAsh").value = "10";
+
+            renderAll();
+
+            showNotice(
+                `Quality check for ${id}: ` +
+                (passed
+                    ? "PASS — all measurements meet the entered limits."
+                    : "FAIL — one or more measurements exceed the entered limits.")
+            );
+        }
+    );
+
+    // DISPATCH
+    document.getElementById("dispatchForm").addEventListener(
+        "submit", function (event) {
+            event.preventDefault();
+
+            if (!this.reportValidity()) return;
+
+            const buyer = document.getElementById("dispatchBuyer").value.trim();
+            const destination = document.getElementById("dispatchDestination").value.trim();
+            const batchId = document.getElementById("dispatchBatch").value;
+            const quantity = Number(document.getElementById("dispatchQuantity").value);
+            const truck = document.getElementById("truckNumber").value.trim();
+            const date = document.getElementById("dispatchDate").value;
+
+            const batch = state.batches.find(item => item.id === batchId);
+
+            if (!buyer || !destination || !truck || !date) {
+                showNotice("Complete all dispatch fields.", true);
+                return;
+            }
+
+            if (!batch || batch.qualityStatus !== "Passed") {
+                showNotice("Dispatch blocked: the selected batch has not passed quality inspection.", true);
+                return;
+            }
+
+            if (!Number.isFinite(quantity) || quantity <= 0) {
+                showNotice("Enter a valid positive dispatch quantity.", true);
+                return;
+            }
+
+            if (quantity > batch.remaining) {
+                showNotice(
+                    `Only ${formatTons(batch.remaining)} remain in this batch.`,
+                    true
+                );
+                return;
+            }
+
+            if (quantity > pelletStockTotal()) {
+                showNotice("Insufficient finished-pellet stock.", true);
+                return;
+            }
+
+            if (date !== todayString()) {
+                showNotice("Record new dispatches using today's date.", true);
+                return;
+            }
+
+            const id = "DSP-" + state.nextDispatch++;
+
+            batch.remaining -= quantity;
+
+            state.dispatches.push({
+                id,
+                date,
+                buyer,
+                destination,
+                batchId,
+                quantity,
+                truck
+            });
+
+            this.reset();
+            document.getElementById("dispatchDate").value = todayString();
+
+            renderAll();
+
+            showNotice(
+                `${id} recorded. ${formatTons(quantity)} deducted from batch ${batchId}.`
+            );
+        }
+    );
+
+    // SEARCH PRODUCTION HISTORY
+    function applyBatchSearch() {
+        const query = document.getElementById("batchSearch")
+            .value.toLowerCase();
+
+        document.querySelectorAll("#batchBody tr").forEach(row => {
+            row.style.display =
+                row.textContent.toLowerCase().includes(query) ? "" : "none";
+        });
+    }
+
+    document.getElementById("batchSearch")
+        .addEventListener("input", applyBatchSearch);
+
+    // UPDATE DISPATCH LIMIT WHEN A BATCH IS SELECTED
+    document.getElementById("dispatchBatch")
+        .addEventListener("change", function () {
+            const batch = state.batches.find(item => item.id === this.value);
+
+            document.getElementById("dispatchQuantity").max =
+                batch ? String(batch.remaining) : "0";
+        });
+
+    // DATE INPUT DEFAULTS
+    const today = todayString();
+
+    document.getElementById("batchDate").value = today;
+    document.getElementById("batchDate").min = today;
+    document.getElementById("batchDate").max = today;
+
+    document.getElementById("testDate").value = today;
+    document.getElementById("testDate").max = today;
+
+    document.getElementById("dispatchDate").value = today;
+    document.getElementById("dispatchDate").min = today;
+    document.getElementById("dispatchDate").max = today;
+
+    renderAll();
+});
+</script>
+{% endblock %}

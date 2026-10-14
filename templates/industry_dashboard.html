@@ -1,0 +1,1266 @@
+{% extends "base.html" %}
+
+{% block title %}Industrial Buyer Dashboard | GreenRoute{% endblock %}
+
+{% block extra_css %}
+<style>
+    .industry-page {
+        max-width: 1350px;
+        margin: 0 auto;
+        padding: 35px 5%;
+        color: #24372b;
+    }
+
+    .industry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .industry-header h1 {
+        margin: 8px 0;
+        font-size: clamp(27px, 4vw, 38px);
+        color: #103e2c;
+    }
+
+    .eyebrow {
+        color: #176b45;
+        font-size: 10px;
+        letter-spacing: 1.6px;
+        font-weight: 800;
+    }
+
+    .muted {
+        color: #748278;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .industry-badge {
+        background: #eaf5ec;
+        color: #176b45;
+        padding: 10px 15px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .demo-notice {
+        padding: 13px 16px;
+        margin-bottom: 25px;
+        border: 1px solid #efdca5;
+        border-radius: 9px;
+        background: #fff8e4;
+        color: #795a14;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .buyer-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        padding: 20px;
+        background: white;
+        border: 1px solid #e3e9e0;
+        border-radius: 13px;
+        box-shadow: 0 4px 15px #173d2106;
+    }
+
+    .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .stat-label {
+        color: #748278;
+        font-size: 12px;
+    }
+
+    .stat-icon {
+        height: 40px;
+        width: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: #eaf5ec;
+        font-size: 21px;
+    }
+
+    .stat-value {
+        margin: 13px 0 5px;
+        font-size: 27px;
+        font-weight: 800;
+        color: #103e2c;
+        overflow-wrap: anywhere;
+    }
+
+    .stat-note {
+        color: #748278;
+        font-size: 11px;
+    }
+
+    .industry-section {
+        margin-bottom: 28px;
+        scroll-margin-top: 95px;
+    }
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+
+    .section-heading h2 {
+        margin: 0;
+        font-size: 19px;
+    }
+
+    .section-heading p {
+        margin: 5px 0 0;
+        color: #748278;
+        font-size: 12px;
+    }
+
+    .panel {
+        background: white;
+        border: 1px solid #e3e9e0;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .panel-heading {
+        padding: 21px 23px;
+        border-bottom: 1px solid #e9eee7;
+    }
+
+    .panel-heading h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #103e2c;
+    }
+
+    .panel-heading p {
+        margin: 6px 0 0;
+        color: #748278;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .panel-body {
+        padding: 23px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+    .field {
+        min-width: 0;
+    }
+
+    .field.full {
+        grid-column: 1 / -1;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #405047;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #dce5d9;
+        border-radius: 8px;
+        font: inherit;
+        font-size: 13px;
+        color: #24372b;
+        background: white;
+        outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+        border-color: #176b45;
+        box-shadow: 0 0 0 3px #176b4515;
+    }
+
+    .field small {
+        display: block;
+        margin-top: 6px;
+        color: #748278;
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        grid-column: 1 / -1;
+    }
+
+    .btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 11px 15px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .2s;
+    }
+
+    .btn-green {
+        color: white;
+        background: #176b45;
+    }
+
+    .btn-green:hover {
+        background: #103e2c;
+    }
+
+    .btn-light {
+        background: white;
+        border-color: #dce5d9;
+        color: #405047;
+    }
+
+    .btn-light:hover {
+        background: #f4f7f2;
+    }
+
+    .btn:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+    }
+
+    .two-column {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(270px, .8fr);
+        gap: 18px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 14px 16px;
+        text-align: left;
+        border-bottom: 1px solid #edf0eb;
+        font-size: 12px;
+    }
+
+    .data-table th {
+        color: #748278;
+        background: #fafbf8;
+        font-weight: 700;
+    }
+
+    .data-table td {
+        color: #405047;
+    }
+
+    .data-table tbody tr:hover {
+        background: #f8fbf7;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .status-green {
+        background: #e5f5e9;
+        color: #207147;
+    }
+
+    .status-yellow {
+        background: #fff2d6;
+        color: #88601a;
+    }
+
+    .status-blue {
+        background: #e6efff;
+        color: #285baa;
+    }
+
+    .status-red {
+        background: #ffede8;
+        color: #954437;
+    }
+
+    .search-input {
+        width: 240px;
+        max-width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #dce5d9;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .info-card {
+        padding: 19px;
+        border-radius: 12px;
+        background: #eaf5ec;
+        border: 1px solid #d7ead7;
+    }
+
+    .info-card h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+    }
+
+    .info-card p,
+    .info-card li {
+        color: #617367;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .info-card ul {
+        padding-left: 18px;
+        margin-top: 10px;
+    }
+
+    .notice {
+        display: none;
+        padding: 12px 15px;
+        margin-bottom: 18px;
+        border-radius: 8px;
+        background: #eaf5ec;
+        color: #176b45;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .notice.error {
+        display: block;
+        background: #fff0eb;
+        color: #963f28;
+    }
+
+    .payment-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        padding: 22px;
+    }
+
+    .payment-summary p {
+        color: #748278;
+        font-size: 12px;
+    }
+
+    .payment-amount {
+        font-size: 27px;
+        font-weight: 800;
+        margin: 5px 0;
+        color: #103e2c;
+        overflow-wrap: anywhere;
+    }
+
+    .empty-state {
+        padding: 24px;
+        text-align: center;
+        color: #748278;
+        font-size: 12px;
+    }
+
+    @media (max-width: 1000px) {
+        .buyer-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .two-column {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .industry-page {
+            padding: 25px 4%;
+        }
+
+        .buyer-stats {
+            gap: 10px;
+        }
+
+        .stat-card {
+            padding: 14px;
+        }
+
+        .stat-value {
+            font-size: 23px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .field.full,
+        .form-actions {
+            grid-column: 1 / -1;
+        }
+
+        .panel-body,
+        .panel-heading {
+            padding: 17px;
+        }
+
+        .search-input {
+            width: 100%;
+        }
+    }
+
+    @media print {
+        .no-print,
+        form,
+        .demo-notice {
+            display: none !important;
+        }
+
+        .industry-page {
+            max-width: 100%;
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<main class="industry-page">
+
+    <header class="industry-header">
+        <div>
+            <div class="eyebrow">INDUSTRIAL BUYER WORKSPACE</div>
+            <h1>Industrial Dashboard 🏭</h1>
+            <p class="muted">
+                Create biomass purchase orders, specify fuel quality,
+                review supply and coordinate deliveries.
+            </p>
+        </div>
+
+        <span class="industry-badge">🌱 GreenRoute Buyer Portal</span>
+
+        <button class="btn btn-light no-print"
+                type="button"
+                onclick="window.print()">
+            Print Dashboard
+        </button>
+    </header>
+
+    <div class="demo-notice">
+        <strong>Prototype mode:</strong>
+        These are demonstration records. Changes are stored in this browser
+        only; they are not automatically shared with aggregators or pellet
+        plants until the Flask backend and database are connected.
+    </div>
+
+    <div id="industryNotice" class="notice"
+         role="status" aria-live="polite"></div>
+
+    <!-- SUMMARY CARDS -->
+    <section class="buyer-stats">
+
+        <article class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Active Orders</span>
+                <span class="stat-icon">📋</span>
+            </div>
+            <div class="stat-value" id="activeOrders">2</div>
+            <div class="stat-note">Orders awaiting completion</div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Outstanding Demand</span>
+                <span class="stat-icon">🌾</span>
+            </div>
+            <div class="stat-value" id="demandTotal">180 t</div>
+            <div class="stat-note">Quantity remaining on active orders</div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">In-Transit Shipments</span>
+                <span class="stat-icon">🚚</span>
+            </div>
+            <div class="stat-value" id="transitCount">1</div>
+            <div class="stat-note">Sample deliveries in progress</div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Delivered This Session</span>
+                <span class="stat-icon">✅</span>
+            </div>
+            <div class="stat-value" id="deliveredTotal">0 t</div>
+            <div class="stat-note">Delivery quantities recorded in this session</div>
+        </article>
+
+    </section>
+
+    <!-- PURCHASE ORDER FORM -->
+    <section id="new-order" class="industry-section">
+        <div class="section-heading">
+            <div>
+                <h2>Create Biomass Purchase Order</h2>
+                <p>Specify the fuel requirements for your industrial facility.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h3>Fuel Procurement Requirements</h3>
+                <p>
+                    Enter quantity, delivery deadline, quality requirements
+                    and target budget.
+                </p>
+            </div>
+
+            <div class="panel-body">
+                <form id="purchaseOrderForm" class="form-grid">
+
+                    <div class="field">
+                        <label for="companyName">Company Name</label>
+                        <input id="companyName" required maxlength="120"
+                               placeholder="e.g. ABC Industries">
+                    </div>
+
+                    <div class="field">
+                        <label for="factoryLocation">Factory Location</label>
+                        <input id="factoryLocation" required maxlength="160"
+                               placeholder="e.g. Coimbatore, Tamil Nadu">
+                    </div>
+
+                    <div class="field">
+                        <label for="factoryPincode">Factory PIN Code</label>
+                        <input id="factoryPincode" required
+                               pattern="[0-9]{6}" maxlength="6"
+                               inputmode="numeric"
+                               placeholder="641402">
+                    </div>
+
+                    <div class="field">
+                        <label for="pelletType">Required Biomass Pellet Type</label>
+                        <select id="pelletType" required>
+                            <option value="">Select pellet type</option>
+                            <option>Rice straw pellets</option>
+                            <option>Sugarcane residue pellets</option>
+                            <option>Mixed agricultural biomass pellets</option>
+                            <option>Other approved biomass pellets</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="quantity">Required Quantity (tons)</label>
+                        <input id="quantity" type="number"
+                               min="0.1" max="1000000" step="0.1"
+                               required placeholder="e.g. 100">
+                    </div>
+
+                    <div class="field">
+                        <label for="deadline">Delivery Deadline</label>
+                        <input id="deadline" type="date" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="maxMoisture">Maximum Moisture (%)</label>
+                        <input id="maxMoisture" type="number"
+                               min="0" max="100" step="0.1"
+                               required value="14">
+                    </div>
+
+                    <div class="field">
+                        <label for="minGcv">Minimum GCV (kcal/kg)</label>
+                        <input id="minGcv" type="number"
+                               min="0" step="1"
+                               required value="3500">
+                    </div>
+
+                    <div class="field">
+                        <label for="maxAsh">Maximum Ash Content (%)</label>
+                        <input id="maxAsh" type="number"
+                               min="0" max="100" step="0.1"
+                               required value="10">
+                    </div>
+
+                    <div class="field">
+                        <label for="budget">Target Budget per Ton (₹)</label>
+                        <input id="budget" type="number"
+                               min="0" step="0.01"
+                               placeholder="Optional">
+                        <small>Enter your target delivered price, if known.</small>
+                    </div>
+
+                    <div class="field full">
+                        <label for="buyerNotes">Additional Requirements</label>
+                        <textarea id="buyerNotes" rows="3" maxlength="1000"
+                                  placeholder="Boiler fuel requirements, unloading restrictions, delivery instructions..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-green" type="submit">
+                            + Create Purchase Order
+                        </button>
+
+                        <button class="btn btn-light" type="reset">
+                            Clear Form
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUPPLIER STOCK -->
+    <section id="supply" class="industry-section">
+        <div class="section-heading">
+            <div>
+                <h2>Available Supplier Stock</h2>
+                <p>Illustrative pellet inventory from sample plants.</p>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>Pellet Plant Availability</h3>
+                    <p>Confirm actual inventory and test results before purchasing.</p>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Plant</th>
+                                <th>Location</th>
+                                <th>Pellet Stock</th>
+                                <th>Quality Record</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supplierTableBody">
+                            <tr>
+                                <td>Eco Pellet Plant</td>
+                                <td>Coimbatore</td>
+                                <td>80 t</td>
+                                <td><span class="status status-green">Sample record</span></td>
+                            </tr>
+                            <tr>
+                                <td>Green Fuel Plant</td>
+                                <td>Tiruppur</td>
+                                <td>60 t</td>
+                                <td><span class="status status-yellow">Verify batch</span></td>
+                            </tr>
+                            <tr>
+                                <td>BioEnergy Plant</td>
+                                <td>Erode</td>
+                                <td>100 t</td>
+                                <td><span class="status status-green">Sample record</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <aside class="info-card">
+                <h3>🧪 Fuel Quality Requirements</h3>
+                <p>
+                    Quality information should be compared with the
+                    specifications entered in each purchase order.
+                </p>
+                <ul>
+                    <li>Moisture at or below the specified maximum.</li>
+                    <li>Gross calorific value at or above the specified minimum.</li>
+                    <li>Ash content at or below the specified maximum.</li>
+                    <li>Sufficient finished-pellet stock for the order.</li>
+                </ul>
+                <p>
+                    The supplier entries are demonstration data, not
+                    verified commercial offers.
+                </p>
+            </aside>
+        </div>
+    </section>
+
+    <!-- PURCHASE ORDERS -->
+    <section id="orders" class="industry-section">
+        <div class="section-heading">
+            <div>
+                <h2>My Purchase Orders</h2>
+                <p>Review quantities, deadlines and order status.</p>
+            </div>
+
+            <input class="search-input no-print"
+                   id="orderSearch"
+                   type="search"
+                   aria-label="Search purchase orders"
+                   placeholder="Search orders...">
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Company</th>
+                            <th>Pellet Type</th>
+                            <th>Outstanding Quantity</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th class="no-print">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="ordersBody">
+
+                        <tr data-quantity="100"
+                            data-status="Submitted"
+                            data-company="ABC Industries"
+                            data-deadline="2026-10-20"
+                            data-pincode="641402"
+                            data-moisture="14"
+                            data-gcv="3500"
+                            data-ash="10"
+                            data-budget=""
+                            data-notes="">
+                            <td>PO-1001</td>
+                            <td>ABC Industries</td>
+                            <td>Rice straw pellets</td>
+                            <td>100 t</td>
+                            <td>2026-10-20</td>
+                            <td><span class="status status-yellow">Submitted</span></td>
+                            <td class="no-print">
+                                <button class="btn btn-light cancel-order"
+                                        type="button">Cancel</button>
+                            </td>
+                        </tr>
+
+                        <tr data-quantity="80"
+                            data-status="In Transit"
+                            data-company="ABC Industries"
+                            data-deadline="2026-10-22"
+                            data-pincode="641402"
+                            data-moisture="14"
+                            data-gcv="3500"
+                            data-ash="10"
+                            data-budget=""
+                            data-notes="">
+                            <td>PO-1002</td>
+                            <td>ABC Industries</td>
+                            <td>Mixed agricultural biomass pellets</td>
+                            <td>80 t</td>
+                            <td>2026-10-22</td>
+                            <td><span class="status status-blue">In Transit</span></td>
+                            <td class="no-print">
+                                <button class="btn btn-light" type="button" disabled>
+                                    In Transit
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr data-quantity="0"
+                            data-status="Completed"
+                            data-company="ABC Industries"
+                            data-deadline="2026-10-12"
+                            data-pincode="641402"
+                            data-moisture="14"
+                            data-gcv="3500"
+                            data-ash="10"
+                            data-budget=""
+                            data-notes="">
+                            <td>PO-1003</td>
+                            <td>ABC Industries</td>
+                            <td>Sugarcane residue pellets</td>
+                            <td>0 t remaining</td>
+                            <td>2026-10-12</td>
+                            <td><span class="status status-green">Completed</span></td>
+                            <td class="no-print">
+                                <button class="btn btn-light" type="button" disabled>
+                                    Completed
+                                </button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHIPMENT TRACKING -->
+    <section id="deliveries" class="industry-section">
+        <div class="section-heading">
+            <div>
+                <h2>Shipment Tracking</h2>
+                <p>Review dispatch details and recorded delivery progress.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Truck</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Load</th>
+                            <th>Shipment Status</th>
+                            <th>GPS Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="shipmentBody">
+                        <tr>
+                            <td>TN-37-AB-1234</td>
+                            <td>Coimbatore Plant</td>
+                            <td>ABC Industries</td>
+                            <td>20 t</td>
+                            <td><span class="status status-blue">In Transit</span></td>
+                            <td>Not connected</td>
+                        </tr>
+
+                        <tr>
+                            <td>TN-33-CD-5678</td>
+                            <td>Tiruppur Plant</td>
+                            <td>ABC Industries</td>
+                            <td>18 t</td>
+                            <td><span class="status status-yellow">Scheduled</span></td>
+                            <td>Not connected</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FREIGHT COST ESTIMATOR -->
+    <section id="procurement" class="industry-section">
+        <div class="section-heading">
+            <div>
+                <h2>Procurement Cost Estimator</h2>
+                <p>Estimate transport and handling costs before route optimization is connected.</p>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>Freight Estimate</h3>
+                    <p>Enter an assumed distance and freight rate.</p>
+                </div>
+
+                <div class="panel-body">
+                    <form id="costForm" class="form-grid">
+
+                        <div class="field">
+                            <label for="costQuantity">Quantity (tons)</label>
+                            <input type="number" id="costQuantity"
+                                   min="0.1" step="0.1" required value="100">
+                        </div>
+
+                        <div class="field">
+                            <label for="distance">One-Way Distance (km)</label>
+                            <input type="number" id="distance"
+                                   min="0" step="0.1" required value="40">
+                        </div>
+
+                        <div class="field">
+                            <label for="rate">Freight Rate (₹ per ton-km)</label>
+                            <input type="number" id="rate"
+                                   min="0" step="0.01" required value="3">
+                        </div>
+
+                        <div class="field">
+                            <label for="handlingCost">Handling Cost (₹ per ton)</label>
+                            <input type="number" id="handlingCost"
+                                   min="0" step="0.01" required value="100">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-green">
+                                Calculate Estimate
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <div class="info-card" aria-live="polite">
+                <h3>Estimated Logistics Cost</h3>
+                <p>Calculated using your entered assumptions.</p>
+
+                <div class="payment-amount" id="estimatedCost">₹22,000</div>
+
+                <p id="costBreakdown">
+                    Freight: ₹12,000 · Handling: ₹10,000
+                </p>
+
+                <p>
+                    This is not an optimized transport quote. Actual costs
+                    depend on routes, vehicle allocation, road restrictions
+                    and supplier details.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PERFORMANCE SUMMARY -->
+    <section class="industry-section">
+        <div class="section-heading">
+            <div>
+                <h2>Buyer Performance Summary</h2>
+                <p>Operational measures for future database integration.</p>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div class="info-card">
+                <h3>📦 Order Fulfilment</h3>
+                <p>
+                    Compare accepted delivery quantities with ordered
+                    quantities to measure how much of your fuel demand
+                    has been fulfilled.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h3>🌿 Estimated Coal Displacement</h3>
+                <p>
+                    Estimate coal replacement using biomass consumption,
+                    heating values and boiler efficiency assumptions.
+                    One ton of pellets does not automatically replace
+                    one ton of coal.
+                </p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const orderForm = document.getElementById("purchaseOrderForm");
+    const ordersBody = document.getElementById("ordersBody");
+    const notice = document.getElementById("industryNotice");
+
+    let nextOrderId = 1004;
+    let deliveredThisSession = 0;
+
+    function showNotice(message, isError = false) {
+        notice.textContent = message;
+        notice.className = isError ? "notice error" : "notice";
+        notice.style.display = "block";
+    }
+
+    function formatNumber(value) {
+        return Number(value).toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        });
+    }
+
+    function createStatusBadge(status) {
+        const badge = document.createElement("span");
+        badge.className = "status";
+
+        if (["Completed", "Delivered"].includes(status)) {
+            badge.classList.add("status-green");
+        } else if (["In Transit"].includes(status)) {
+            badge.classList.add("status-blue");
+        } else if (["Cancelled", "Rejected"].includes(status)) {
+            badge.classList.add("status-red");
+        } else {
+            badge.classList.add("status-yellow");
+        }
+
+        badge.textContent = status;
+        return badge;
+    }
+
+    function makeCell(value) {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        return cell;
+    }
+
+    function refreshMetrics() {
+        const rows = Array.from(ordersBody.querySelectorAll("tr"));
+
+        const activeRows = rows.filter(row =>
+            !["Completed", "Cancelled", "Rejected"].includes(
+                row.dataset.status
+            )
+        );
+
+        const outstanding = activeRows.reduce((total, row) =>
+            total + Number(row.dataset.quantity || 0), 0
+        );
+
+        const transit = activeRows.filter(row =>
+            row.dataset.status === "In Transit"
+        ).length;
+
+        document.getElementById("activeOrders").textContent =
+            activeRows.length;
+
+        document.getElementById("demandTotal").textContent =
+            formatNumber(outstanding) + " t";
+
+        document.getElementById("transitCount").textContent = transit;
+
+        document.getElementById("deliveredTotal").textContent =
+            formatNumber(deliveredThisSession) + " t";
+    }
+
+    orderForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        if (!orderForm.reportValidity()) {
+            return;
+        }
+
+        const company = document.getElementById("companyName")
+            .value.trim();
+
+        const location = document.getElementById("factoryLocation")
+            .value.trim();
+
+        const pincode = document.getElementById("factoryPincode")
+            .value.trim();
+
+        const pelletType = document.getElementById("pelletType").value;
+        const quantity = Number(document.getElementById("quantity").value);
+        const deadline = document.getElementById("deadline").value;
+        const moisture = Number(document.getElementById("maxMoisture").value);
+        const gcv = Number(document.getElementById("minGcv").value);
+        const ash = Number(document.getElementById("maxAsh").value);
+        const budgetInput = document.getElementById("budget").value;
+        const budget = budgetInput === "" ? null : Number(budgetInput);
+
+        if (!company || !location || !pelletType || !deadline) {
+            showNotice("Complete all required purchase order fields.", true);
+            return;
+        }
+
+        if (!/^\d{6}$/.test(pincode)) {
+            showNotice("Enter a valid six-digit factory PIN code.", true);
+            return;
+        }
+
+        if (!Number.isFinite(quantity) || quantity <= 0 ||
+            !Number.isFinite(moisture) || moisture < 0 || moisture > 100 ||
+            !Number.isFinite(gcv) || gcv < 0 ||
+            !Number.isFinite(ash) || ash < 0 || ash > 100) {
+            showNotice("Check the quantity and fuel-quality values.", true);
+            return;
+        }
+
+        if (budget !== null &&
+            (!Number.isFinite(budget) || budget < 0)) {
+            showNotice("Enter a valid target budget.", true);
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const deliveryDate = new Date(deadline + "T00:00:00");
+
+        if (Number.isNaN(deliveryDate.getTime()) || deliveryDate < today) {
+            showNotice("Choose a valid delivery deadline that is today or later.", true);
+            return;
+        }
+
+        const id = "PO-" + nextOrderId++;
+        const row = document.createElement("tr");
+
+        row.dataset.quantity = String(quantity);
+        row.dataset.status = "Submitted";
+        row.dataset.company = company;
+        row.dataset.location = location;
+        row.dataset.deadline = deadline;
+        row.dataset.pincode = pincode;
+        row.dataset.moisture = String(moisture);
+        row.dataset.gcv = String(gcv);
+        row.dataset.ash = String(ash);
+        row.dataset.budget = budget === null ? "" : String(budget);
+        row.dataset.notes = document.getElementById("buyerNotes")
+            .value.trim();
+
+        row.appendChild(makeCell(id));
+        row.appendChild(makeCell(company));
+        row.appendChild(makeCell(pelletType));
+        row.appendChild(makeCell(formatNumber(quantity) + " t"));
+        row.appendChild(makeCell(deadline));
+
+        const statusCell = document.createElement("td");
+        statusCell.appendChild(createStatusBadge("Submitted"));
+        row.appendChild(statusCell);
+
+        const actionCell = document.createElement("td");
+        actionCell.className = "no-print";
+
+        const cancelButton = document.createElement("button");
+        cancelButton.className = "btn btn-light cancel-order";
+        cancelButton.type = "button";
+        cancelButton.textContent = "Cancel";
+
+        actionCell.appendChild(cancelButton);
+        row.appendChild(actionCell);
+
+        ordersBody.prepend(row);
+        orderForm.reset();
+
+        document.getElementById("maxMoisture").value = "14";
+        document.getElementById("minGcv").value = "3500";
+        document.getElementById("maxAsh").value = "10";
+
+        refreshMetrics();
+        applyOrderSearch();
+
+        showNotice(
+            id + " created for " + company +
+            ". This is a browser demonstration; the order has not been saved to the database."
+        );
+    });
+
+    ordersBody.addEventListener("click", function (event) {
+        const button = event.target.closest(".cancel-order");
+
+        if (!button) {
+            return;
+        }
+
+        const row = button.closest("tr");
+        const status = row.dataset.status;
+
+        if (["Completed", "Cancelled", "Rejected", "In Transit"].includes(status)) {
+            showNotice("This order cannot be cancelled from the demonstration screen.", true);
+            return;
+        }
+
+        if (!confirm("Cancel this demonstration purchase order?")) {
+            return;
+        }
+
+        row.dataset.status = "Cancelled";
+        row.querySelector(".status").replaceWith(
+            createStatusBadge("Cancelled")
+        );
+
+        button.disabled = true;
+        button.textContent = "Cancelled";
+
+        refreshMetrics();
+        showNotice("Purchase order cancelled in this browser demonstration.");
+    });
+
+    function applyOrderSearch() {
+        const term = document.getElementById("orderSearch")
+            .value.toLowerCase();
+
+        ordersBody.querySelectorAll("tr").forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(term)
+                ? ""
+                : "none";
+        });
+    }
+
+    document.getElementById("orderSearch")
+        .addEventListener("input", applyOrderSearch);
+
+    document.getElementById("costForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        if (!this.reportValidity()) {
+            return;
+        }
+
+        const quantity = Number(document.getElementById("costQuantity").value);
+        const distance = Number(document.getElementById("distance").value);
+        const rate = Number(document.getElementById("rate").value);
+        const handling = Number(document.getElementById("handlingCost").value);
+
+        if (![quantity, distance, rate, handling].every(Number.isFinite) ||
+            quantity <= 0 || distance < 0 || rate < 0 || handling < 0) {
+            showNotice(
+                "Enter a positive quantity and non-negative cost assumptions.",
+                true
+            );
+            return;
+        }
+
+        const freight = quantity * distance * rate;
+        const handlingTotal = quantity * handling;
+        const total = freight + handlingTotal;
+
+        document.getElementById("estimatedCost").textContent =
+            "₹" + formatNumber(total);
+
+        document.getElementById("costBreakdown").textContent =
+            "Freight: ₹" + formatNumber(freight) +
+            " · Handling: ₹" + formatNumber(handlingTotal);
+
+        showNotice("Illustrative logistics estimate updated.");
+    });
+
+    const now = new Date();
+    const localDate = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0")
+    ].join("-");
+
+    document.getElementById("deadline").min = localDate;
+
+    refreshMetrics();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenRoute | Admin Dashboard</title>
+
+<style>
+:root {
+    --green: #176b45;
+    --dark: #103e2c;
+    --bg: #f4f7f2;
+    --white: #ffffff;
+    --text: #24372b;
+    --muted: #78857b;
+    --border: #e4eae2;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 245px;
+    background: var(--dark);
+    color: white;
+    padding: 25px 16px;
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+    padding: 5px 10px 30px;
+}
+
+.logo span {
+    color: #b9ef87;
+}
+
+.admin-label {
+    color: #a6c7b0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 10px;
+    padding: 0 12px;
+    margin-bottom: 12px;
+}
+
+.sidebar nav a {
+    display: block;
+    text-decoration: none;
+    color: #d6e4d9;
+    padding: 12px 14px;
+    margin-bottom: 5px;
+    border-radius: 9px;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+    background: #275a40;
+    color: white;
+}
+
+.sidebar nav a.active {
+    border-left: 3px solid #b9ef87;
+}
+
+.sidebar-footer {
+    margin: 35px 8px 0;
+    padding: 15px 10px;
+    border-top: 1px solid #315844;
+    color: #c1d4c6;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 28px 32px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.topbar h1 {
+    font-size: 27px;
+    letter-spacing: -0.8px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.top-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button, .button {
+    cursor: pointer;
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 15px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.btn-green {
+    background: var(--green);
+    color: white;
+}
+
+.btn-light {
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+button:hover, .button:hover {
+    opacity: 0.85;
+}
+
+.demo-notice {
+    padding: 12px 15px;
+    background: #fff7df;
+    border: 1px solid #f1dfae;
+    color: #765b19;
+    border-radius: 9px;
+    font-size: 12px;
+    margin-bottom: 24px;
+}
+
+.section {
+    scroll-margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.section-heading h2 {
+    font-size: 17px;
+}
+
+.section-heading p {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 21px;
+    box-shadow: 0 4px 14px #173d2106;
+}
+
+.stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.stat-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #e9f4e8;
+    font-size: 20px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 13px 0 6px;
+    letter-spacing: -1px;
+}
+
+.stat-description {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.green-text {
+    color: var(--green);
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(250px, 0.8fr);
+    gap: 18px;
+}
+
+.table-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.table-heading {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-heading h3 {
+    font-size: 15px;
+}
+
+.table-heading p {
+    margin-top: 5px;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.search {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 210px;
+    max-width: 100%;
+    outline: none;
+}
+
+.search:focus {
+    border-color: var(--green);
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    white-space: nowrap;
+}
+
+th, td {
+    padding: 15px 18px;
+    text-align: left;
+    border-bottom: 1px solid #edf0eb;
+    font-size: 12px;
+}
+
+th {
+    background: #fafbf8;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+td {
+    color: #405047;
+}
+
+tbody tr:hover {
+    background: #f8fbf7;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.status-ok {
+    color: #207147;
+    background: #e5f5e9;
+}
+
+.status-pending {
+    color: #88601a;
+    background: #fff2d6;
+}
+
+.status-transit {
+    color: #285baa;
+    background: #e6efff;
+}
+
+.status-review {
+    color: #9a4e2f;
+    background: #ffede4;
+}
+
+.activity-list {
+    padding: 20px;
+}
+
+.activity {
+    display: flex;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #edf0eb;
+}
+
+.activity:last-child {
+    border-bottom: 0;
+}
+
+.activity-icon {
+    width: 37px;
+    height: 37px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: #e9f4e8;
+    border-radius: 10px;
+}
+
+.activity strong {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.activity p {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.activity time {
+    display: block;
+    margin-top: 5px;
+    color: #8a968b;
+    font-size: 10px;
+}
+
+.bar-chart {
+    height: 180px;
+    padding: 22px 20px 10px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 14px;
+}
+
+.bar-item {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.bar {
+    width: 65%;
+    max-width: 38px;
+    min-height: 5px;
+    background: #4b9568;
+    border-radius: 6px 6px 0 0;
+    transition: height 0.4s;
+}
+
+.bar:hover {
+    background: #185d3c;
+}
+
+.bar-label {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.bar-note {
+    color: var(--muted);
+    font-size: 11px;
+    text-align: center;
+    padding: 12px 15px 18px;
+}
+
+.center-list {
+    padding: 20px;
+}
+
+.center-item {
+    margin-bottom: 21px;
+}
+
+.center-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 9px;
+    font-size: 12px;
+}
+
+.center-title span {
+    color: var(--muted);
+}
+
+.progress {
+    height: 8px;
+    background: #e9eee7;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-inner {
+    height: 100%;
+    background: #4b9568;
+    border-radius: inherit;
+}
+
+.footer {
+    text-align: center;
+    padding: 25px 0 5px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.empty {
+    padding: 25px;
+    text-align: center;
+    color: var(--muted);
+}
+
+@media (max-width: 1100px) {
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 800px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main {
+        padding: 22px 18px;
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .layout {
+        display: block;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .logo {
+        padding-bottom: 15px;
+    }
+
+    .sidebar nav {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;
+    }
+
+    .sidebar nav a {
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .main {
+        padding: 22px 13px;
+    }
+
+    .stats {
+        gap: 10px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .topbar h1 {
+        font-size: 23px;
+    }
+
+    .search {
+        width: 100%;
+    }
+
+    .table-heading {
+        align-items: stretch;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="logo">🌱 Green<span>Route</span></div>
+
+        <div class="admin-label">Administration</div>
+
+        <nav>
+            <a href="#overview" class="active">▦ &nbsp; Overview</a>
+            <a href="#users">♙ &nbsp; Users</a>
+            <a href="#inventory">▤ &nbsp; Inventory</a>
+            <a href="#orders">▣ &nbsp; Purchase Orders</a>
+            <a href="#shipments">🚚 &nbsp; Shipments</a>
+            <a href="#payments">₹ &nbsp; Payments</a>
+            <a href="#analytics">▥ &nbsp; Analytics</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <strong>Smart Biomass System</strong><br>
+            Admin workspace<br>
+            Sustainable supply chain
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p class="subtitle">
+                    Monitor biomass procurement and supply-chain operations.
+                </p>
+            </div>
+
+            <div class="top-actions">
+                <button class="btn-light" onclick="window.print()">
+                    Print Report
+                </button>
+                <button class="btn-green" onclick="exportOrders()">
+                    Export Orders ↓
+                </button>
+            </div>
+        </header>
+
+        <div class="demo-notice">
+            <strong>Demo mode:</strong>
+            The figures and records below are sample data for the
+            dashboard design. Connect the database to display actual
+            project information.
+        </div>
+
+        <section class="section" id="overview">
+            <div class="section-heading">
+                <div>
+                    <h2>Supply Chain Overview</h2>
+                    <p>Sample operational indicators</p>
+                </div>
+                <span class="status status-ok">System overview</span>
+            </div>
+
+            <div class="stats">
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Registered Users</span>
+                        <span class="stat-icon">👥</span>
+                    </div>
+                    <div class="stat-value">248</div>
+                    <div class="stat-description">
+                        Farmers, aggregators and buyers
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Available Residue</span>
+                        <span class="stat-icon">🌾</span>
+                    </div>
+                    <div class="stat-value">1,250 <small>t</small></div>
+                    <div class="stat-description">
+                        Registered raw agricultural residue
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Pending Orders</span>
+                        <span class="stat-icon">📦</span>
+                    </div>
+                    <div class="stat-value">18</div>
+                    <div class="stat-description">
+                        Purchase orders awaiting fulfillment
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Active Shipments</span>
+                        <span class="stat-icon">🚛</span>
+                    </div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-description">
+                        Shipments currently in progress
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="users">
+            <div class="section-heading">
+                <div>
+                    <h2>Registered Users</h2>
+                    <p>Sample user records</p>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-heading">
+                    <div>
+                        <h3>User Management</h3>
+                        <p>Search across the sample records</p>
+                    </div>
+                    <input class="search" id="userSearch"
+                           type="search" placeholder="Search users...">
+                </div>
+
+                <div class="table-wrap">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Kumar</td>
+                                <td>Farmer</td>
+                                <td>Sulur</td>
+                                <td><span class="status status-ok">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>Ravi Biomass</td>
+                                <td>Aggregator</td>
+                                <td>Coimbatore</td>
+                                <td><span class="status status-ok">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>Green Energy Ltd.</td>
+                                <td>Industrial Buyer</td>
+                                <td>Tiruppur</td>
+                                <td><span class="status status-pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>EcoPellets Plant</td>
+                                <td>Pellet Plant</td>
+                                <td>Erode</td>
+                                <td><span class="status status-ok">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="inventory">
+            <div class="section-heading">
+                <div>
+                    <h2>Aggregation Center Inventory</h2>
+                    <p>Illustrative storage utilization</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="table-card">
+                    <div class="table-heading">
+                        <div>
+                            <h3>Collection Centers</h3>
+                            <p>Sample center capacities and stock</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Center</th>
+                                    <th>Capacity</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sulur Center</td>
+                                    <td>500 t</td>
+                                    <td>320 t</td>
+                                    <td><span class="status status-ok">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Erode Center</td>
+                                    <td>400 t</td>
+                                    <td>280 t</td>
+                                    <td><span class="status status-ok">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Tiruppur Center</td>
+                                    <td>300 t</td>
+                                    <td>270 t</td>
+                                    <td><span class="status status-pending">Near Capacity</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-heading">
+                        <div>
+                            <h3>Storage Utilization</h3>
+                            <p>Stock versus total capacity</p>
+                        </div>
+                    </div>
+
+                    <div class="center-list">
+                        <div class="center-item">
+                            <div class="center-title">
+                                <strong>Sulur Center</strong>
+                                <span>64%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-inner" style="width:64%"></div>
+                            </div>
+                        </div>
+
+                        <div class="center-item">
+                            <div class="center-title">
+                                <strong>Erode Center</strong>
+                                <span>70%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-inner" style="width:70%"></div>
+                            </div>
+                        </div>
+
+                        <div class="center-item">
+                            <div class="center-title">
+                                <strong>Tiruppur Center</strong>
+                                <span>90%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-inner" style="width:90%; background:#d49a37"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="orders">
+            <div class="section-heading">
+                <div>
+                    <h2>Industrial Purchase Orders</h2>
+                    <p>Sample order tracking records</p>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-heading">
+                    <div>
+                        <h3>Recent Orders</h3>
+                        <p>Export these sample records as CSV</p>
+                    </div>
+                    <input class="search" id="orderSearch"
+                           type="search" placeholder="Search orders...">
+                </div>
+
+                <div class="table-wrap">
+                    <table id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Buyer</th>
+                                <th>Quantity</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>PO-1001</td>
+                                <td>Green Energy Ltd.</td>
+                                <td>100 t</td>
+                                <td>2026-10-20</td>
+                                <td><span class="status status-pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>PO-1002</td>
+                                <td>ABC Industries</td>
+                                <td>80 t</td>
+                                <td>2026-10-22</td>
+                                <td><span class="status status-transit">In Progress</span></td>
+                            </tr>
+                            <tr>
+                                <td>PO-1003</td>
+                                <td>Eco Boiler Works</td>
+                                <td>120 t</td>
+                                <td>2026-10-24</td>
+                                <td><span class="status status-ok">Approved</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="shipments">
+            <div class="section-heading">
+                <div>
+                    <h2>Truck Shipments</h2>
+                    <p>Sample shipment and dispatch details</p>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-heading">
+                    <div>
+                        <h3>Shipment Manifest</h3>
+                        <p>Connect this table to GPS and delivery records later</p>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Truck</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Load</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TN-37-AB-1234</td>
+                                <td>Sulur Center</td>
+                                <td>Coimbatore Factory</td>
+                                <td>20 t</td>
+                                <td><span class="status status-transit">In Transit</span></td>
+                            </tr>
+                            <tr>
+                                <td>TN-33-CD-5678</td>
+                                <td>Erode Plant</td>
+                                <td>Tiruppur Factory</td>
+                                <td>18 t</td>
+                                <td><span class="status status-pending">Scheduled</span></td>
+                            </tr>
+                            <tr>
+                                <td>TN-39-EF-9012</td>
+                                <td>Pellet Plant A</td>
+                                <td>Industrial Buyer</td>
+                                <td>22 t</td>
+                                <td><span class="status status-ok">Delivered</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="payments">
+            <div class="section-heading">
+                <div>
+                    <h2>Farmer Payments</h2>
+                    <p>Sample settlement records</p>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-heading">
+                    <div>
+                        <h3>Payment Register</h3>
+                        <p>Demonstration values, not actual transactions</p>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Farmer</th>
+                                <th>Quantity Accepted</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Kumar</td>
+                                <td>8 t</td>
+                                <td>₹16,000</td>
+                                <td><span class="status status-ok">Paid</span></td>
+                            </tr>
+                            <tr>
+                                <td>Ravi</td>
+                                <td>12 t</td>
+                                <td>₹24,000</td>
+                                <td><span class="status status-pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>Priya</td>
+                                <td>5 t</td>
+                                <td>₹10,000</td>
+                                <td><span class="status status-pending">Pending</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="analytics">
+            <div class="section-heading">
+                <div>
+                    <h2>Biomass Procurement Analytics</h2>
+                    <p>Illustrative monthly delivery quantities</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="table-card">
+                    <div class="table-heading">
+                        <div>
+                            <h3>Monthly Biomass Deliveries</h3>
+                            <p>Sample values in tons</p>
+                        </div>
+                    </div>
+
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar" style="height:36%"></div>
+                            <span class="bar-label">May</span>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height:49%"></div>
+                            <span class="bar-label">Jun</span>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height:57%"></div>
+                            <span class="bar-label">Jul</span>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height:48%"></div>
+                            <span class="bar-label">Aug</span>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height:75%"></div>
+                            <span class="bar-label">Sep</span>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height:95%"></div>
+                            <span class="bar-label">Oct</span>
+                        </div>
+                    </div>
+
+                    <p class="bar-note">
+                        Example trend only — future charts will use database records.
+                    </p>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-heading">
+                        <div>
+                            <h3>Key Performance Indicators</h3>
+                            <p>Illustrative metrics</p>
+                        </div>
+                    </div>
+
+                    <div class="center-list">
+                        <div class="center-item">
+                            <div class="center-title">
+                                <strong>On-time delivery</strong>
+                                <span>90%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-inner" style="width:90%"></div>
+                            </div>
+                        </div>
+
+                        <div class="center-item">
+                            <div class="center-title">
+                                <strong>Moisture compliance</strong>
+                                <span>94%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-inner" style="width:94%"></div>
+                            </div>
+                        </div>
+
+                        <div class="center-item">
+                            <div class="center-title">
+                                <strong>Order fulfilment</strong>
+                                <span>82%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-inner" style="width:82%"></div>
+                            </div>
+                        </div>
+
+                        <p class="subtitle">
+                            Freight cost and estimated coal displacement
+                            will be calculated after database integration.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            GreenRoute · Smart Biomass Procurement & Logistics System<br>
+            Admin Dashboard Prototype
+        </footer>
+
+    </main>
+</div>
+
+<script>
+/* Filter the user table */
+function setupFilter(inputId, tableId) {
+    const input = document.getElementById(inputId);
+    const table = document.getElementById(tableId);
+
+    input.addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+
+        table.querySelectorAll("tbody tr").forEach(function (row) {
+            row.style.display = row.textContent.toLowerCase().includes(query)
+                ? ""
+                : "none";
+        });
+    });
+}
+
+setupFilter("userSearch", "usersTable");
+setupFilter("orderSearch", "ordersTable");
+
+/* Export currently visible purchase-order rows as CSV */
+function exportOrders() {
+    const table = document.getElementById("ordersTable");
+    const rows = Array.from(table.querySelectorAll("tr"))
+        .filter(row => row.style.display !== "none");
+
+    const csv = rows.map(row =>
+        Array.from(row.querySelectorAll("th, td"))
+            .map(cell => {
+                const value = cell.innerText.trim().replace(/"/g, '""');
+                return `"${value}"`;
+            })
+            .join(",")
+    ).join("\r\n");
+
+    const blob = new Blob(["\uFEFF" + csv], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "biomass_purchase_orders.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+/* Highlight the selected sidebar section */
+document.querySelectorAll(".sidebar nav a").forEach(link => {
+    link.addEventListener("click", function () {
+        document.querySelectorAll(".sidebar nav a").forEach(item => {
+            item.classList.remove("active");
+        });
+
+        this.classList.add("active");
+    });
+});
+</script>
+
+</body>
+</html>

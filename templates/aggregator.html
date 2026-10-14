@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenRoute | Aggregator Dashboard</title>
+
+    <style>
+        :root {
+            --green: #176b45;
+            --dark: #103e2c;
+            --light: #f4f7f2;
+            --white: #ffffff;
+            --text: #24372b;
+            --muted: #78857b;
+            --border: #e3e9e0;
+            --orange: #e4a23c;
+            --red: #c7473b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background: var(--light);
+        }
+
+        button, input, select, textarea {
+            font: inherit;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 235px;
+            background: var(--dark);
+            color: white;
+            padding: 25px 16px;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 800;
+            padding: 5px 10px 28px;
+        }
+
+        .logo span {
+            color: #b9ef87;
+        }
+
+        .sidebar-label {
+            color: #a6c7b0;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            margin: 0 12px 12px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: #d6e4d9;
+            text-decoration: none;
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: #275a40;
+            color: white;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid #315844;
+            margin-top: 30px;
+            padding: 17px 10px;
+            font-size: 12px;
+            line-height: 1.8;
+            color: #c1d4c6;
+        }
+
+        .sidebar-footer a {
+            color: #b9ef87;
+            text-decoration: none;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 28px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 23px;
+        }
+
+        h1 {
+            font-size: 27px;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        .button {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 15px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-green {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-light {
+            background: white;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .button:hover,
+        .small-button:hover {
+            opacity: 0.85;
+        }
+
+        .demo-notice {
+            padding: 12px 15px;
+            background: #fff6dc;
+            border: 1px solid #f0dfac;
+            border-radius: 9px;
+            color: #755b20;
+            font-size: 12px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+            scroll-margin-top: 20px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .section-heading h2 {
+            font-size: 19px;
+            margin: 0;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            font-size: 12px;
+            margin: 5px 0 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .card, .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 14px #173d2105;
+        }
+
+        .card {
+            padding: 20px;
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #e8f4e7;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 12px 0 6px;
+        }
+
+        .stat-note {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .panel {
+            overflow: hidden;
+        }
+
+        .panel-heading {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .panel-heading h3 {
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .panel-heading p {
+            color: var(--muted);
+            font-size: 11px;
+            margin: 5px 0 0;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            color: #45594a;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            display: block;
+            margin-top: 7px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            border: 1px solid #dce5d9;
+            background: white;
+            color: var(--text);
+            font-size: 12px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 1px solid var(--green);
+            border-color: var(--green);
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px 15px;
+            border-bottom: 1px solid #edf0eb;
+            font-size: 12px;
+        }
+
+        th {
+            color: var(--muted);
+            background: #fafbf8;
+            font-weight: 700;
+        }
+
+        tbody tr:hover {
+            background: #f8fbf7;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .status-green {
+            color: #207147;
+            background: #e5f5e9;
+        }
+
+        .status-yellow {
+            color: #88601a;
+            background: #fff2d6;
+        }
+
+        .status-blue {
+            color: #285baa;
+            background: #e6efff;
+        }
+
+        .status-red {
+            color: #a12d28;
+            background: #ffebe8;
+        }
+
+        .small-button {
+            border: none;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: white;
+            background: var(--green);
+            cursor: pointer;
+            font-size: 11px;
+            margin: 2px;
+        }
+
+        .small-button:disabled {
+            background: #9aaa9d;
+            cursor: default;
+        }
+
+        .center-list {
+            padding: 20px;
+        }
+
+        .center-item {
+            margin-bottom: 24px;
+        }
+
+        .center-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 9px;
+            font-size: 12px;
+        }
+
+        .center-title span {
+            color: var(--muted);
+        }
+
+        .progress {
+            width: 100%;
+            height: 9px;
+            border-radius: 20px;
+            background: #e9eee7;
+            overflow: hidden;
+        }
+
+        .progress-inner {
+            height: 100%;
+            background: #4c9668;
+            border-radius: inherit;
+            transition: width .25s;
+        }
+
+        .grid-two {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 18px;
+        }
+
+        .toast {
+            display: none;
+            padding: 12px 15px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            background: #e7f5e9;
+            color: #20683a;
+        }
+
+        .toast.error {
+            background: #fff0e9;
+            color: #963f28;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px 0 5px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        @media(max-width: 1100px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .grid-two {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 650px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .sidebar nav {
+                display: flex;
+                gap: 5px;
+                overflow-x: auto;
+            }
+
+            .sidebar nav a {
+                white-space: nowrap;
+            }
+
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main {
+                padding: 20px 12px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                gap: 10px;
+            }
+
+            .card {
+                padding: 14px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+        }
+
+        @media print {
+            .sidebar, .no-print, form, .demo-notice {
+                display: none !important;
+            }
+
+            .main {
+                padding: 0;
+            }
+
+            body {
+                background: white;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="logo">🌱 Green<span>Route</span></div>
+        <div class="sidebar-label">AGGREGATOR WORKSPACE</div>
+
+        <nav>
+            <a href="#overview" class="active">▦ Overview</a>
+            <a href="#collection">🌾 Farmer Collection</a>
+            <a href="#inventory">🏬 Stock & Quality</a>
+            <a href="#buyers">🏭 Buyer Requirements</a>
+            <a href="#dispatch">🚚 Transport & Dispatch</a>
+            <a href="#history">▤ History</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <strong>Aggregator Portal</strong><br>
+            Manage biomass supply and deliveries<br>
+            <a href="/">← Back to Home</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>Aggregator Dashboard</h1>
+                <p class="subtitle">
+                    Manage farmers, raw biomass stock, buyer orders and transportation.
+                </p>
+            </div>
+
+            <button class="button btn-light no-print"
+                    onclick="window.print()">
+                Print Dashboard
+            </button>
+        </header>
+
+        <div class="demo-notice">
+            <strong>Prototype mode:</strong>
+            This version saves demonstration records in your browser using
+            localStorage. It is not yet connected to the Flask database or a live GPS device.
+        </div>
+
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <!-- OVERVIEW -->
+        <section id="overview" class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>Supply Overview</h2>
+                    <p>Current biomass availability and logistics summary.</p>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Available Stock</span>
+                        <span class="stat-icon">🌾</span>
+                    </div>
+                    <div class="stat-value" id="stockMetric">225.0 t</div>
+                    <div class="stat-note">Biomass stored in centers</div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Pending Pickups</span>
+                        <span class="stat-icon">📅</span>
+                    </div>
+                    <div class="stat-value" id="pendingMetric">2</div>
+                    <div class="stat-note">Farmer collections to complete</div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Buyer Orders</span>
+                        <span class="stat-icon">🏭</span>
+                    </div>
+                    <div class="stat-value" id="orderMetric">2</div>
+                    <div class="stat-note">Recorded buyer requirements</div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-top">
+                        <span class="stat-label">Active Shipments</span>
+                        <span class="stat-icon">🚚</span>
+                    </div>
+                    <div class="stat-value" id="shipmentMetric">1</div>
+                    <div class="stat-note">Dispatches not yet delivered</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FARMER COLLECTION -->
+        <section id="collection" class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>Farmer Availability & Collection</h2>
+                    <p>Record the farmer's residue type, quantity, location and availability.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Create Collection Request</h3>
+                        <p>Enter farmer and pickup details.</p>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <form id="collectionForm" class="form-grid">
+                        <label>
+                            Farmer Name
+                            <input id="farmerName" required maxlength="100"
+                                   placeholder="Enter farmer name">
+                        </label>
+
+                        <label>
+                            Phone Number
+                            <input id="farmerPhone" type="tel"
+                                   pattern="[0-9]{10}" maxlength="10"
+                                   placeholder="10-digit phone number" required>
+                        </label>
+
+                        <label>
+                            PIN Code
+                            <input id="farmerPincode" required
+                                   pattern="[0-9]{6}" maxlength="6"
+                                   inputmode="numeric" placeholder="641402">
+                        </label>
+
+                        <label>
+                            Village / District
+                            <input id="farmerDistrict" required maxlength="100"
+                                   placeholder="Village or district">
+                        </label>
+
+                        <label>
+                            Residue Type
+                            <select id="residueType" required>
+                                <option value="">Select residue</option>
+                                <option>Rice straw</option>
+                                <option>Wheat straw</option>
+                                <option>Sugarcane residue</option>
+                                <option>Cotton stalks</option>
+                                <option>Groundnut shells</option>
+                                <option>Other crop residue</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Available Quantity (tons)
+                            <input id="pickupQuantity" type="number"
+                                   min="0.1" step="0.1" max="100000" required
+                                   placeholder="For example: 10">
+                        </label>
+
+                        <label>
+                            Moisture Level (%)
+                            <input id="pickupMoisture" type="number"
+                                   min="0" max="100" step="0.1" required
+                                   placeholder="For example: 12">
+                        </label>
+
+                        <label>
+                            Available / Pickup Date
+                            <input id="pickupDate" type="date" required>
+                        </label>
+
+                        <label>
+                            Collection Center
+                            <select id="pickupCenter" required>
+                                <option value="0">Sulur Collection Center</option>
+                                <option value="1">Pollachi Biomass Hub</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Pickup Location Notes
+                            <input id="pickupLocation" maxlength="150"
+                                   placeholder="Landmark or farm location">
+                        </label>
+
+                        <div class="form-actions">
+                            <button class="button btn-green" type="submit">
+                                + Schedule Collection
+                            </button>
+                            <button class="button btn-light" type="reset">
+                                Clear Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- INVENTORY AND QUALITY -->
+        <section id="inventory" class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>Stock, Capacity & Quality</h2>
+                    <p>Monitor available residue, storage capacity and recorded moisture levels.</p>
+                </div>
+            </div>
+
+            <div class="grid-two">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Collection Center Capacity</h3>
+                            <p>Current stock compared with maximum capacity.</p>
+                        </div>
+                    </div>
+
+                    <div class="center-list" id="centerList"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Quality Monitoring</h3>
+                            <p>Latest collection moisture readings in this prototype.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Farmer</th>
+                                <th>Residue</th>
+                                <th>Moisture</th>
+                                <th>Quality Indicator</th>
+                            </tr>
+                            </thead>
+                            <tbody id="qualityBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BUYER REQUIREMENTS -->
+        <section id="buyers" class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>Buyer Requirements & Orders</h2>
+                    <p>Record what the pellet plant or industrial buyer wants to purchase.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Add Buyer Requirement</h3>
+                        <p>Capture buyer contact details, quantity, residue type and quality needs.</p>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <form id="buyerForm" class="form-grid">
+                        <label>
+                            Buyer / Company Name
+                            <input id="buyerName" required maxlength="120"
+                                   placeholder="Company name">
+                        </label>
+
+                        <label>
+                            Buyer Contact Number
+                            <input id="buyerPhone" type="tel" required
+                                   pattern="[0-9]{10}" maxlength="10"
+                                   placeholder="10-digit phone number">
+                        </label>
+
+                        <label>
+                            Required Residue
+                            <select id="buyerResidue" required>
+                                <option value="">Select residue</option>
+                                <option>Rice straw</option>
+                                <option>Wheat straw</option>
+                                <option>Sugarcane residue</option>
+                                <option>Cotton stalks</option>
+                                <option>Groundnut shells</option>
+                                <option>Other crop residue</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Required Quantity (tons)
+                            <input id="buyerQuantity" type="number" min="0.1"
+                                   max="100000" step="0.1" required>
+                        </label>
+
+                        <label>
+                            Maximum Acceptable Moisture (%)
+                            <input id="buyerMaxMoisture" type="number"
+                                   min="0" max="100" step="0.1" required>
+                        </label>
+
+                        <label>
+                            Delivery Destination
+                            <input id="buyerDestination" required maxlength="150"
+                                   placeholder="Plant / industry address">
+                        </label>
+
+                        <label>
+                            Required Delivery Date
+                            <input id="buyerDate" type="date" required>
+                        </label>
+
+                        <div class="form-actions">
+                            <button class="button btn-green" type="submit">
+                                + Add Buyer Requirement
+                            </button>
+                            <button class="button btn-light" type="reset">
+                                Clear Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Buyer</th>
+                            <th>Contact</th>
+                            <th>Residue</th>
+                            <th>Required Qty</th>
+                            <th>Max Moisture</th>
+                            <th>Destination</th>
+                            <th>Delivery Date</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody id="buyerBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRANSPORT AND DISPATCH -->
+        <section id="dispatch" class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>Transport & Dispatch Management</h2>
+                    <p>Assign vehicle and driver details while dispatching biomass to a buyer.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Create Dispatch</h3>
+                        <p>Dispatch is checked against stock and the selected buyer's moisture requirement.</p>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <form id="dispatchForm" class="form-grid">
+                        <label>
+                            Buyer Order
+                            <select id="dispatchOrder" required></select>
+                        </label>
+
+                        <label>
+                            Collection Center
+                            <select id="dispatchCenter" required>
+                                <option value="0">Sulur Collection Center</option>
+                                <option value="1">Pollachi Biomass Hub</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Dispatch Quantity (tons)
+                            <input id="dispatchQuantity" type="number"
+                                   min="0.1" max="100000" step="0.1" required>
+                        </label>
+
+                        <label>
+                            Vehicle Number
+                            <input id="vehicleNumber" required maxlength="30"
+                                   placeholder="TN 00 AB 1234">
+                        </label>
+
+                        <label>
+                            Driver Name
+                            <input id="driverName" required maxlength="100"
+                                   placeholder="Driver name">
+                        </label>
+
+                        <label>
+                            Driver Phone
+                            <input id="driverPhone" type="tel" required
+                                   pattern="[0-9]{10}" maxlength="10"
+                                   placeholder="10-digit phone number">
+                        </label>
+
+                        <label>
+                            Dispatch Date
+                            <input id="dispatchDate" type="date" required>
+                        </label>
+
+                        <label>
+                            Initial Transport Status
+                            <select id="dispatchStatus" required>
+                                <option>Ready for Dispatch</option>
+                                <option>In Transit</option>
+                            </select>
+                        </label>
+
+                        <div class="form-actions">
+                            <button class="button btn-green" type="submit">
+                                Record Dispatch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top:18px">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Shipment & Transport Tracker</h3>
+                        <p>Transport details are kept with the shipment. Location entries are manual in this prototype.</p>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Shipment ID</th>
+                            <th>Buyer</th>
+                            <th>Vehicle / Driver</th>
+                            <th>Driver Contact</th>
+                            <th>Quantity</th>
+                            <th>Destination</th>
+                            <th>Status</th>
+                            <th>Last Known Location</th>
+                            <th>Update</th>
+                        </tr>
+                        </thead>
+                        <tbody id="shipmentBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- COLLECTION HISTORY -->
+        <section id="history" class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>Collection History</h2>
+                    <p>Review scheduled and completed farmer collections.</p>
+                </div>
+
+                <input id="collectionSearch" class="no-print"
+                       type="search" placeholder="Search farmer, PIN or residue..."
+                       style="width:250px;max-width:100%">
+            </div>
+
+            <div class="panel">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Farmer</th>
+                            <th>Phone</th>
+                            <th>Location</th>
+                            <th>Residue</th>
+                            <th>Quantity</th>
+                            <th>Moisture</th>
+                            <th>Date</th>
+                            <th>Center</th>
+                            <th>Status</th>
+                            <th class="no-print">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="collectionBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            GreenRoute · Smart Biomass Supply Chain · Aggregator Workspace
+        </footer>
+    </main>
+</div>
+
+<script>
+    const STORAGE_KEY = "greenroute_aggregator_v1";
+
+    const initialData = {
+        centers: [
+            { name: "Sulur Collection Center", shortName: "Sulur Center",
+              capacity: 300, stock: 140, location: "Sulur, Coimbatore" },
+            { name: "Pollachi Biomass Hub", shortName: "Pollachi Hub",
+              capacity: 250, stock: 85, location: "Pollachi" }
+        ],
+
+        pickups: [
+            {
+                id: "PICK-1001", farmer: "Kumar", phone: "9876543210",
+                pincode: "641402", district: "Sulur, Coimbatore",
+                location: "Sample farm", residue: "Rice straw",
+                quantity: 12, moisture: 12, date: "2026-10-18",
+                centerId: 0, status: "Scheduled"
+            },
+            {
+                id: "PICK-1002", farmer: "Ravi", phone: "9876543211",
+                pincode: "642001", district: "Pollachi",
+                location: "Sample farm", residue: "Sugarcane residue",
+                quantity: 8, moisture: 16, date: "2026-10-19",
+                centerId: 1, status: "Scheduled"
+            }
+        ],
+
+        buyers: [
+            {
+                id: "ORD-2001", name: "Coimbatore Pellet Plant",
+                phone: "9876543212", residue: "Rice straw",
+                quantity: 50, maxMoisture: 15,
+                destination: "Coimbatore", date: "2026-10-25",
+                status: "Pending"
+            },
+            {
+                id: "ORD-2002", name: "Green Energy Industries",
+                phone: "9876543213", residue: "Sugarcane residue",
+                quantity: 30, maxMoisture: 18,
+                destination: "Tiruppur", date: "2026-10-27",
+                status: "Pending"
+            }
+        ],
+
+        shipments: [
+            {
+                id: "SHIP-3001", orderId: "ORD-2001",
+                buyer: "Coimbatore Pellet Plant",
+                vehicle: "TN 37 AB 1234", driver: "Sample Driver",
+                phone: "9876543214", quantity: 10,
+                destination: "Coimbatore", status: "In Transit",
+                location: "Sulur, Coimbatore", date: "2026-10-14"
+            }
+        ],
+
+        collectedDuringSession: 0,
+        nextPickup: 1003,
+        nextOrder: 2003,
+        nextShipment: 3002
+    };
+
+    let data;
+
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        data = saved ? JSON.parse(saved) : structuredClone(initialData);
+    } catch {
+        data = structuredClone(initialData);
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    function notify(message, isError = false) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast" + (isError ? " error" : "");
+        toast.style.display = "block";
+    }
+
+    function formatTons(value) {
+        return Number(value).toFixed(1) + " t";
+    }
+
+    function statusClass(status) {
+        if (["Collected", "Delivered", "Completed"].includes(status)) {
+            return "status-green";
+        }
+
+        if (["In Transit", "Ready for Dispatch"].includes(status)) {
+            return "status-blue";
+        }
+
+        if (["Cancelled", "Rejected"].includes(status)) {
+            return "status-red";
+        }
+
+        return "status-yellow";
+    }
+
+    function badge(status) {
+        return `<span class="status ${statusClass(status)}">${escapeHTML(status)}</span>`;
+    }
+
+    function renderMetrics() {
+        const totalStock = data.centers.reduce(
+            (sum, center) => sum + center.stock, 0
+        );
+
+        document.getElementById("stockMetric").textContent =
+            formatTons(totalStock);
+
+        document.getElementById("pendingMetric").textContent =
+            data.pickups.filter(p => p.status === "Scheduled").length;
+
+        document.getElementById("orderMetric").textContent =
+            data.buyers.filter(o => o.status === "Pending").length;
+
+        document.getElementById("shipmentMetric").textContent =
+            data.shipments.filter(s => !["Delivered", "Cancelled"].includes(s.status)).length;
+    }
+
+    function renderCenters() {
+        document.getElementById("centerList").innerHTML =
+            data.centers.map((center, index) => {
+                const percent = center.capacity > 0
+                    ? Math.min(center.stock / center.capacity * 100, 100)
+                    : 0;
+
+                return `
+                    <div class="center-item">
+                        <div class="center-title">
+                            <strong>${escapeHTML(center.name)}</strong>
+                            <span>${formatTons(center.stock)} / ${formatTons(center.capacity)}</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-inner" style="width:${percent}%"></div>
+                        </div>
+                        <div class="stat-note" style="margin-top:7px">
+                            ${escapeHTML(center.location)} ·
+                            ${Math.max(0, center.capacity - center.stock).toFixed(1)} tons remaining
+                        </div>
+                    </div>`;
+            }).join("");
+    }
+
+    function renderPickups() {
+        const body = document.getElementById("collectionBody");
+
+        body.innerHTML = data.pickups.map(p => `
+            <tr>
+                <td>${escapeHTML(p.farmer)}</td>
+                <td>${escapeHTML(p.phone)}</td>
+                <td>${escapeHTML(p.district)} (${escapeHTML(p.pincode)})</td>
+                <td>${escapeHTML(p.residue)}</td>
+                <td>${formatTons(p.quantity)}</td>
+                <td>${Number(p.moisture).toFixed(1)}%</td>
+                <td>${escapeHTML(p.date)}</td>
+                <td>${escapeHTML(data.centers[p.centerId]?.shortName || "Unknown")}</td>
+                <td>${badge(p.status)}</td>
+                <td class="no-print">
+                    ${
+                        p.status === "Scheduled"
+                        ? `<button class="small-button"
+                            data-action="collect" data-id="${escapeHTML(p.id)}">
+                            Mark Collected
+                           </button>`
+                        : "-"
+                    }
+                </td>
+            </tr>
+        `).join("");
+
+        applyCollectionSearch();
+    }
+
+    function qualityText(moisture) {
+        // Demonstration thresholds only; actual limits depend on buyer specifications.
+        if (moisture <= 15) return "Within example limit";
+        if (moisture <= 20) return "Check buyer requirement";
+        return "High moisture";
+    }
+
+    function renderQuality() {
+        const latest = [...data.pickups].reverse();
+
+        document.getElementById("qualityBody").innerHTML =
+            latest.length ? latest.map(p => {
+                const quality = qualityText(Number(p.moisture));
+                const cls = Number(p.moisture) <= 15
+                    ? "status-green"
+                    : Number(p.moisture) <= 20
+                        ? "status-yellow"
+                        : "status-red";
+
+                return `
+                    <tr>
+                        <td>${escapeHTML(p.farmer)}</td>
+                        <td>${escapeHTML(p.residue)}</td>
+                        <td>${Number(p.moisture).toFixed(1)}%</td>
+                        <td><span class="status ${cls}">${quality}</span></td>
+                    </tr>`;
+            }).join("")
+            : `<tr><td colspan="4">No moisture readings recorded yet.</td></tr>`;
+    }
+
+    function renderBuyers() {
+        document.getElementById("buyerBody").innerHTML =
+            data.buyers.map(order => `
+                <tr>
+                    <td>${escapeHTML(order.id)}</td>
+                    <td>${escapeHTML(order.name)}</td>
+                    <td>${escapeHTML(order.phone)}</td>
+                    <td>${escapeHTML(order.residue)}</td>
+                    <td>${formatTons(order.quantity)}</td>
+                    <td>${Number(order.maxMoisture).toFixed(1)}%</td>
+                    <td>${escapeHTML(order.destination)}</td>
+                    <td>${escapeHTML(order.date)}</td>
+                    <td>${badge(order.status)}</td>
+                </tr>
+            `).join("");
+
+        const select = document.getElementById("dispatchOrder");
+        const previousValue = select.value;
+
+        const pendingOrders = data.buyers.filter(o => o.status === "Pending");
+
+        select.innerHTML = pendingOrders.length
+            ? pendingOrders.map(o => `
+                <option value="${escapeHTML(o.id)}">
+                    ${escapeHTML(o.id)} — ${escapeHTML(o.name)} — ${escapeHTML(o.residue)}
+                </option>
+            `).join("")
+            : `<option value="">No pending buyer orders</option>`;
+
+        if (pendingOrders.some(o => o.id === previousValue)) {
+            select.value = previousValue;
+        }
+    }
+
+    function renderShipments() {
+        document.getElementById("shipmentBody").innerHTML =
+            data.shipments.map(s => {
+                const canUpdate = !["Delivered", "Cancelled"].includes(s.status);
+
+                return `
+                    <tr>
+                        <td>${escapeHTML(s.id)}</td>
+                        <td>${escapeHTML(s.buyer)}</td>
+                        <td>${escapeHTML(s.vehicle)} / ${escapeHTML(s.driver)}</td>
+                        <td>${escapeHTML(s.phone)}</td>
+                        <td>${formatTons(s.quantity)}</td>
+                        <td>${escapeHTML(s.destination)}</td>
+                        <td>${badge(s.status)}</td>
+                        <td>
+                            <input aria-label="Location for ${escapeHTML(s.id)}"
+                                   data-location="${escapeHTML(s.id)}"
+                                   value="${escapeHTML(s.location)}"
+                                   maxlength="180"
+                                   style="min-width:160px">
+                        </td>
+                        <td class="no-print">
+                            ${
+                                canUpdate
+                                ? `<button class="small-button"
+                                    data-action="location" data-id="${escapeHTML(s.id)}">
+                                    Save Location
+                                   </button>
+                                   <button class="small-button"
+                                    data-action="status" data-id="${escapeHTML(s.id)}">
+                                    Update Status
+                                   </button>`
+                                : "Closed"
+                            }
+                        </td>
+                    </tr>`;
+            }).join("");
+    }
+
+    function renderAll() {
+        renderMetrics();
+        renderCenters();
+        renderPickups();
+        renderQuality();
+        renderBuyers();
+        renderShipments();
+        saveData();
+    }
+
+    document.getElementById("collectionForm").addEventListener("submit", event => {
+        event.preventDefault();
+
+        const farmer = document.getElementById("farmerName").value.trim();
+        const phone = document.getElementById("farmerPhone").value.trim();
+        const pincode = document.getElementById("farmerPincode").value.trim();
+        const district = document.getElementById("farmerDistrict").value.trim();
+        const residue = document.getElementById("residueType").value;
+        const quantity = Number(document.getElementById("pickupQuantity").value);
+        const moisture = Number(document.getElementById("pickupMoisture").value);
+        const date = document.getElementById("pickupDate").value;
+        const centerId = Number(document.getElementById("pickupCenter").value);
+        const location = document.getElementById("pickupLocation").value.trim();
+
+        if (!/^\d{10}$/.test(phone) || !/^\d{6}$/.test(pincode)) {
+            notify("Enter a valid 10-digit phone number and 6-digit PIN code.", true);
+            return;
+        }
+
+        if (!Number.isFinite(quantity) || quantity <= 0 ||
+            !Number.isFinite(moisture) || moisture < 0 || moisture > 100) {
+            notify("Check the quantity and moisture values.", true);
+            return;
+        }
+
+        if (!farmer || !district || !residue || !date ||
+            !data.centers[centerId]) {
+            notify("Complete all required collection fields.", true);
+            return;
+        }
+
+        const pickup = {
+            id: "PICK-" + data.nextPickup++,
+            farmer, phone, pincode, district, location,
+            residue, quantity, moisture, date,
+            centerId, status: "Scheduled"
+        };
+
+        data.pickups.unshift(pickup);
+        document.getElementById("collectionForm").reset();
+
+        renderAll();
+        notify("Farmer collection request created.");
+    });
+
+    document.getElementById("collectionBody").addEventListener("click", event => {
+        const button = event.target.closest("button[data-action='collect']");
+        if (!button) return;
+
+        const pickup = data.pickups.find(p => p.id === button.dataset.id);
+        if (!pickup || pickup.status !== "Scheduled") return;
+
+        const center = data.centers[pickup.centerId];
+
+        if (!center || center.stock + pickup.quantity > center.capacity) {
+            notify("Not enough storage capacity at this collection center.", true);
+            return;
+        }
+
+        center.stock += pickup.quantity;
+        pickup.status = "Collected";
+        data.collectedDuringSession += pickup.quantity;
+
+        renderAll();
+        notify(pickup.quantity.toFixed(1) + " tons added to center stock.");
+    });
+
+    document.getElementById("buyerForm").addEventListener("submit", event => {
+        event.preventDefault();
+
+        const name = document.getElementById("buyerName").value.trim();
+        const phone = document.getElementById("buyerPhone").value.trim();
+        const residue = document.getElementById("buyerResidue").value;
+        const quantity = Number(document.getElementById("buyerQuantity").value);
+        const maxMoisture = Number(document.getElementById("buyerMaxMoisture").value);
+        const destination = document.getElementById("buyerDestination").value.trim();
+        const date = document.getElementById("buyerDate").value;
+
+        if (!/^\d{10}$/.test(phone)) {
+            notify("Enter a valid 10-digit buyer phone number.", true);
+            return;
+        }
+
+        if (!name || !residue || !destination || !date ||
+            !Number.isFinite(quantity) || quantity <= 0 ||
+            !Number.isFinite(maxMoisture) ||
+            maxMoisture < 0 || maxMoisture > 100) {
+            notify("Enter valid buyer requirements.", true);
+            return;
+        }
+
+        data.buyers.unshift({
+            id: "ORD-" + data.nextOrder++,
+            name, phone, residue, quantity, maxMoisture,
+            destination, date, status: "Pending"
+        });
+
+        document.getElementById("buyerForm").reset();
+
+        renderAll();
+        notify("Buyer requirement added successfully.");
+    });
+
+    document.getElementById("dispatchForm").addEventListener("submit", event => {
+        event.preventDefault();
+
+        const orderId = document.getElementById("dispatchOrder").value;
+        const order = data.buyers.find(o =>
+            o.id === orderId && o.status === "Pending"
+        );
+
+        const centerId = Number(document.getElementById("dispatchCenter").value);
+        const center = data.centers[centerId];
+        const quantity = Number(document.getElementById("dispatchQuantity").value);
+        const vehicle = document.getElementById("vehicleNumber").value.trim();
+        const driver = document.getElementById("driverName").value.trim();
+        const phone = document.getElementById("driverPhone").value.trim();
+        const date = document.getElementById("dispatchDate").value;
+        const status = document.getElementById("dispatchStatus").value;
+
+        if (!order || !center || !vehicle || !driver || !date ||
+            !/^\d{10}$/.test(phone) || !Number.isFinite(quantity) || quantity <= 0) {
+            notify("Enter valid dispatch details and select a pending buyer order.", true);
+            return;
+        }
+
+        if (quantity > center.stock) {
+            notify("Dispatch quantity exceeds the available center stock.", true);
+            return;
+        }
+
+        if (quantity > order.quantity) {
+            notify("Dispatch quantity exceeds the buyer's remaining requested quantity.", true);
+            return;
+        }
+
+        const availableBatches = data.pickups.filter(p =>
+            p.centerId === centerId &&
+            p.residue === order.residue &&
+            p.status === "Collected"
+        );
+
+        if (availableBatches.length === 0) {
+            notify("No collected batch of the required residue type is recorded at this center.", true);
+            return;
+        }
+
+        const totalMatching = availableBatches.reduce(
+            (sum, p) => sum + p.quantity, 0
+        );
+
+        if (totalMatching < quantity) {
+            notify("There is not enough recorded stock of the buyer's required residue type at this center.", true);
+            return;
+        }
+
+        const weightedMoisture = availableBatches.reduce(
+            (sum, p) => sum + p.quantity * p.moisture, 0
+        ) / totalMatching;
+
+        if (weightedMoisture > order.maxMoisture) {
+            notify(
+                "The recorded average moisture (" +
+                weightedMoisture.toFixed(1) +
+                "%) exceeds the buyer's limit (" +
+                order.maxMoisture.toFixed(1) + "%). Dispatch blocked.",
+                true
+            );
+            return;
+        }
+
+        center.stock -= quantity;
+        order.quantity -= quantity;
+
+        if (order.quantity <= 0.0001) {
+            order.quantity = 0;
+            order.status = "Completed";
+        }
+
+        const shipment = {
+            id: "SHIP-" + data.nextShipment++,
+            orderId: order.id,
+            buyer: order.name,
+            vehicle, driver, phone, quantity,
+            destination: order.destination,
+            status,
+            location: center.location,
+            date
+        };
+
+        data.shipments.unshift(shipment);
+
+        document.getElementById("dispatchForm").reset();
+
+        renderAll();
+        notify("Dispatch recorded. Vehicle and driver details are attached to the shipment.");
+    });
+
+    document.getElementById("shipmentBody").addEventListener("click", event => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const shipment = data.shipments.find(s => s.id === button.dataset.id);
+        if (!shipment) return;
+
+        if (button.dataset.action === "location") {
+            const input = document.querySelector(
+                `[data-location="${shipment.id}"]`
+            );
+
+            const location = input?.value.trim();
+
+            if (!location) {
+                notify("Enter a location before saving.", true);
+                return;
+            }
+
+            shipment.location = location;
+            renderAll();
+            notify("Last-known shipment location updated manually.");
+        }
+
+        if (button.dataset.action === "status") {
+            const sequence = [
+                "Ready for Dispatch",
+                "In Transit",
+                "Delivered"
+            ];
+
+            const currentIndex = sequence.indexOf(shipment.status);
+            shipment.status = sequence[
+                Math.min(currentIndex + 1, sequence.length - 1)
+            ];
+
+            renderAll();
+            notify("Shipment status updated to " + shipment.status + ".");
+        }
+    });
+
+    function applyCollectionSearch() {
+        const term = document.getElementById("collectionSearch")
+            .value.toLowerCase();
+
+        document.querySelectorAll("#collectionBody tr").forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(term)
+                ? ""
+                : "none";
+        });
+    }
+
+    document.getElementById("collectionSearch")
+        .addEventListener("input", applyCollectionSearch);
+
+    document.querySelectorAll(".sidebar nav a").forEach(link => {
+        link.addEventListener("click", () => {
+            document.querySelectorAll(".sidebar nav a").forEach(item => {
+                item.classList.remove("active");
+            });
+
+            link.classList.add("active");
+        });
+    });
+
+    renderAll();
+</script>
+</body>
+</html>

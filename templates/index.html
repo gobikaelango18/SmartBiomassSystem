@@ -1,0 +1,891 @@
+{% extends "base.html" %}
+
+{% block title %}GreenRoute | Smart Biomass Procurement{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --gr-green: #176b45;
+    --gr-dark: #103e2c;
+    --gr-lime: #c6ef83;
+    --gr-cream: #f6f8f1;
+    --gr-muted: #718077;
+    --gr-border: #e2e9df;
+}
+
+.hero {
+    padding: 70px 7%;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    align-items: center;
+    gap: 45px;
+    background: radial-gradient(ellipse at 10% 15%, #e3f3dd, transparent 48%),
+                var(--gr-cream);
+}
+
+.eyebrow {
+    display: inline-block;
+    padding: 9px 13px;
+    background: #e7f3e4;
+    color: var(--gr-green);
+    border: 1px solid #d6ead1;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.hero h1 {
+    margin: 24px 0 18px;
+    max-width: 650px;
+    font-size: clamp(40px, 5vw, 65px);
+    line-height: 1.12;
+    letter-spacing: -2px;
+    color: var(--gr-dark);
+}
+
+.hero h1 span {
+    color: var(--gr-green);
+}
+
+.hero-description {
+    max-width: 535px;
+    color: var(--gr-muted);
+    line-height: 1.9;
+    font-size: 14px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.gr-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 18px;
+    border: 1px solid var(--gr-green);
+    border-radius: 9px;
+    background: var(--gr-green);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    transition: background .2s, transform .2s;
+}
+
+.gr-button:hover {
+    background: var(--gr-dark);
+    transform: translateY(-2px);
+}
+
+.gr-button.outline {
+    color: var(--gr-green);
+    background: white;
+    border-color: var(--gr-border);
+}
+
+.gr-button.outline:hover {
+    background: #eaf5ec;
+}
+
+.hero-footnote {
+    margin-top: 25px;
+    color: #6e7b70;
+    font-size: 12px;
+}
+
+.network-panel {
+    padding: 25px;
+    background: white;
+    border: 1px solid var(--gr-border);
+    border-radius: 18px;
+    box-shadow: 0 20px 55px #173d2110;
+}
+
+.network-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--gr-border);
+}
+
+.network-heading small {
+    color: var(--gr-muted);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.network-heading h2 {
+    margin: 6px 0 0;
+    font-size: 19px;
+}
+
+.network-symbol {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    background: #eaf5ec;
+    font-size: 23px;
+}
+
+.network-nodes {
+    padding-top: 17px;
+}
+
+.network-node {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #eaf0e7;
+    background: #fbfcf9;
+    border-radius: 11px;
+    margin-bottom: 5px;
+}
+
+.node-icon {
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    font-size: 23px;
+}
+
+.node-farmer { background: #fff1d8; }
+.node-center { background: #e8efff; }
+.node-plant { background: #f0e8ff; }
+.node-buyer { background: #e1f3e3; }
+
+.node-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.node-details strong,
+.node-details small {
+    display: block;
+}
+
+.node-details strong {
+    font-size: 13px;
+}
+
+.node-details small {
+    margin-top: 3px;
+    color: var(--gr-muted);
+    font-size: 11px;
+}
+
+.node-number {
+    font-size: 10px;
+    font-weight: 800;
+    color: #819186;
+}
+
+.network-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 25px;
+    padding-left: 33px;
+}
+
+.network-link span {
+    height: 18px;
+    width: 2px;
+    background: #a6cdaa;
+}
+
+.network-link small {
+    font-size: 10px;
+    color: var(--gr-muted);
+}
+
+.network-bottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 15px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gr-border);
+    color: var(--gr-muted);
+    font-size: 10px;
+}
+
+.intro-strip {
+    padding: 40px 7%;
+    display: grid;
+    grid-template-columns: 1fr .8fr;
+    gap: 35px;
+    align-items: center;
+    color: white;
+    background: var(--gr-dark);
+}
+
+.strip-label,
+.section-label {
+    color: var(--gr-green);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+}
+
+.strip-label {
+    color: var(--gr-lime);
+}
+
+.intro-strip h2 {
+    margin: 10px 0 0;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.35;
+}
+
+.intro-strip p {
+    color: #d3e2d6;
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.gr-section {
+    padding: 70px 7%;
+}
+
+.section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 28px;
+}
+
+.section-heading h2 {
+    margin: 9px 0 0;
+    font-size: clamp(27px, 3.5vw, 39px);
+    line-height: 1.25;
+    letter-spacing: -1px;
+}
+
+.section-heading > p {
+    max-width: 380px;
+    margin: 0;
+    color: var(--gr-muted);
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.feature-grid,
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.feature-card,
+.role-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 23px;
+    border: 1px solid var(--gr-border);
+    border-radius: 13px;
+    background: white;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.feature-card {
+    min-height: 225px;
+}
+
+.feature-card:hover,
+.role-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px #173d210d;
+}
+
+.feature-icon,
+.role-emoji {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #eaf5ec;
+    font-size: 23px;
+}
+
+.feature-card h3,
+.role-card h3 {
+    margin: 16px 0 8px;
+    font-size: 16px;
+}
+
+.feature-card p,
+.role-card p {
+    color: var(--gr-muted);
+    margin: 0 0 17px;
+    line-height: 1.85;
+    font-size: 12px;
+}
+
+.feature-index {
+    margin-top: auto;
+    color: var(--gr-green);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+}
+
+.workflow {
+    display: grid;
+    grid-template-columns: .8fr 1.2fr;
+    gap: 55px;
+    background: #edf4e9;
+}
+
+.workflow-intro h2 {
+    margin: 10px 0 13px;
+    font-size: clamp(28px, 3.5vw, 39px);
+    line-height: 1.3;
+}
+
+.workflow-intro p {
+    max-width: 410px;
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--gr-muted);
+}
+
+.workflow-list {
+    display: grid;
+    gap: 12px;
+}
+
+.workflow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 17px;
+    padding: 19px;
+    border: 1px solid #dfe8db;
+    border-radius: 12px;
+    background: white;
+}
+
+.step-index {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--gr-green);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.workflow-step h3 {
+    margin: 0 0 5px;
+    font-size: 15px;
+}
+
+.workflow-step p {
+    margin: 0;
+    color: var(--gr-muted);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.roles-section {
+    background: var(--gr-cream);
+}
+
+.role-card a {
+    margin-top: auto;
+    color: var(--gr-green);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.role-card a:hover {
+    text-decoration: underline;
+}
+
+.roles-note {
+    margin-top: 20px;
+    padding: 13px 15px;
+    border: 1px dashed #cbdac8;
+    border-radius: 9px;
+    color: var(--gr-muted);
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.closing-banner {
+    margin: 0 7% 60px;
+    padding: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    border-radius: 18px;
+    background: #e4f0df;
+}
+
+.closing-banner h2 {
+    margin: 8px 0;
+    font-size: clamp(25px, 3vw, 35px);
+    line-height: 1.3;
+}
+
+.closing-banner p {
+    max-width: 580px;
+    margin: 0;
+    color: #617367;
+    font-size: 12px;
+    line-height: 1.9;
+}
+
+.closing-banner .gr-button {
+    flex-shrink: 0;
+}
+
+@media (max-width: 1000px) {
+    .hero {
+        gap: 25px;
+        padding: 50px 5%;
+    }
+
+    .feature-grid,
+    .roles-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .workflow {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 720px) {
+    .hero,
+    .intro-strip,
+    .workflow {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 40px 5%;
+    }
+
+    .intro-strip,
+    .gr-section {
+        padding: 45px 5%;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .closing-banner {
+        align-items: flex-start;
+        flex-direction: column;
+        margin: 0 5% 40px;
+        padding: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .feature-grid,
+    .roles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .network-panel {
+        padding: 16px;
+    }
+
+    .hero-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .hero-actions .gr-button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero" id="home">
+    <div class="hero-content">
+        <div class="eyebrow">
+            <span>●</span>
+            SMART BIOMASS SUPPLY CHAIN
+        </div>
+
+        <h1>
+            From farm waste<br>
+            to <span>industrial energy.</span>
+        </h1>
+
+        <p class="hero-description">
+            Connect farmers, collection centers, pellet plants,
+            transporters and industrial buyers through one intelligent
+            platform. Organize biomass availability, improve logistics,
+            and coordinate reliable fuel deliveries.
+        </p>
+
+        <div class="hero-actions">
+            <a href="#roles" class="gr-button">
+                Explore the platform →
+            </a>
+
+            <a href="#workflow" class="gr-button outline">
+                Discover how it works
+            </a>
+        </div>
+
+        <div class="hero-footnote">
+            🌾 Better collection. Smarter logistics. Cleaner energy.
+        </div>
+    </div>
+
+    <div class="network-panel">
+        <div class="network-heading">
+            <div>
+                <small>SUPPLY CHAIN OVERVIEW</small>
+                <h2>One connected network</h2>
+            </div>
+
+            <div class="network-symbol">⌘</div>
+        </div>
+
+        <div class="network-nodes">
+            <div class="network-node">
+                <div class="node-icon node-farmer">🌾</div>
+                <div class="node-details">
+                    <strong>Farmers</strong>
+                    <small>Residue availability and harvest dates</small>
+                </div>
+                <span class="node-number">01</span>
+            </div>
+
+            <div class="network-link">
+                <span></span>
+                <small>Collection</small>
+            </div>
+
+            <div class="network-node">
+                <div class="node-icon node-center">🏬</div>
+                <div class="node-details">
+                    <strong>Aggregation Centers</strong>
+                    <small>Stock, storage and consolidation</small>
+                </div>
+                <span class="node-number">02</span>
+            </div>
+
+            <div class="network-link">
+                <span></span>
+                <small>Processing</small>
+            </div>
+
+            <div class="network-node">
+                <div class="node-icon node-plant">⚙️</div>
+                <div class="node-details">
+                    <strong>Pellet Plants</strong>
+                    <small>Production and fuel quality</small>
+                </div>
+                <span class="node-number">03</span>
+            </div>
+
+            <div class="network-link">
+                <span></span>
+                <small>Planned delivery</small>
+            </div>
+
+            <div class="network-node">
+                <div class="node-icon node-buyer">🏭</div>
+                <div class="node-details">
+                    <strong>Industrial Buyers</strong>
+                    <small>Fuel requirements and delivery</small>
+                </div>
+                <span class="node-number">04</span>
+            </div>
+        </div>
+
+        <div class="network-bottom">
+            <span>● Connected supply-chain workflow</span>
+            <span>Farm → Factory</span>
+        </div>
+    </div>
+</section>
+
+<section class="intro-strip" id="platform">
+    <div>
+        <div class="strip-label">BUILT FOR BETTER COORDINATION</div>
+        <h2>Every part of the biomass supply chain, working together.</h2>
+    </div>
+
+    <p>
+        Use PIN-code-based location grouping, collection-center management,
+        procurement planning, GPS shipment monitoring and transaction
+        tracking to coordinate the journey from residue to industrial fuel.
+    </p>
+</section>
+
+<section class="gr-section" id="features">
+    <div class="section-heading">
+        <div>
+            <div class="section-label">THE PLATFORM</div>
+            <h2>More than a biomass marketplace.</h2>
+        </div>
+
+        <p>
+            One workspace to organize supply, quality, production,
+            transportation, transactions and operational reporting.
+        </p>
+    </div>
+
+    <div class="feature-grid">
+        <article class="feature-card">
+            <div class="feature-icon">📍</div>
+            <h3>PIN-Code Aggregation</h3>
+            <p>
+                Organize farmer listings by postal area and recommend
+                suitable collection centers using location and capacity.
+            </p>
+            <span class="feature-index">01 / LOCATION</span>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">🧠</div>
+            <h3>Smart Procurement</h3>
+            <p>
+                Match available residue, pellet stocks and industrial
+                purchase orders while considering quality and deadlines.
+            </p>
+            <span class="feature-index">02 / PLANNING</span>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">🚚</div>
+            <h3>Route Optimization</h3>
+            <p>
+                Evaluate source combinations, truck capacity, routes
+                and transportation costs.
+            </p>
+            <span class="feature-index">03 / LOGISTICS</span>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">🛰️</div>
+            <h3>GPS Truck Tracking</h3>
+            <p>
+                Display shipment locations and route progress when
+                GPS tracking data is available.
+            </p>
+            <span class="feature-index">04 / TRACKING</span>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">🧪</div>
+            <h3>Fuel Quality Monitoring</h3>
+            <p>
+                Record moisture, gross calorific value and ash
+                measurements, then compare them with buyer specifications.
+            </p>
+            <span class="feature-index">05 / QUALITY</span>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Transactions & Analytics</h3>
+            <p>
+                Coordinate procurement, transport records, payments,
+                delivery confirmations and performance reports.
+            </p>
+            <span class="feature-index">06 / VISIBILITY</span>
+        </article>
+    </div>
+</section>
+
+<section class="gr-section workflow" id="workflow">
+    <div class="workflow-intro">
+        <div class="section-label">HOW IT WORKS</div>
+        <h2>From scattered residue to planned delivery.</h2>
+        <p>
+            Coordinate each stage of the agricultural biomass supply chain
+            using shared information and practical logistics planning.
+        </p>
+    </div>
+
+    <div class="workflow-list">
+        <article class="workflow-step">
+            <span class="step-index">01</span>
+            <div>
+                <h3>Register Residue</h3>
+                <p>
+                    Farmers enter residue type, quantity, PIN code,
+                    availability date and collection readiness.
+                </p>
+            </div>
+        </article>
+
+        <article class="workflow-step">
+            <span class="step-index">02</span>
+            <div>
+                <h3>Aggregate and Store</h3>
+                <p>
+                    Aggregators coordinate pickups and manage
+                    collection-center capacity and inventory.
+                </p>
+            </div>
+        </article>
+
+        <article class="workflow-step">
+            <span class="step-index">03</span>
+            <div>
+                <h3>Process and Optimize</h3>
+                <p>
+                    Pellet plants manage production while the planning
+                    system evaluates supply and transportation options.
+                </p>
+            </div>
+        </article>
+
+        <article class="workflow-step">
+            <span class="step-index">04</span>
+            <div>
+                <h3>Deliver and Measure</h3>
+                <p>
+                    Track shipments and record quality, delivery
+                    confirmations and payment outcomes.
+                </p>
+            </div>
+        </article>
+    </div>
+</section>
+
+<section class="gr-section roles-section" id="roles">
+    <div class="section-heading">
+        <div>
+            <div class="section-label">CONNECTED USERS</div>
+            <h2>One platform. Six roles.</h2>
+        </div>
+
+        <p>
+            Separate workspaces help every participant manage
+            their part of the biomass supply chain.
+        </p>
+    </div>
+
+    <div class="roles-grid">
+        <article class="role-card">
+            <div class="role-emoji">🌾</div>
+            <h3>Farmer</h3>
+            <p>
+                Register crop residue, harvest schedules and
+                collection availability.
+            </p>
+            <a href="/login">Farmer login →</a>
+        </article>
+
+        <article class="role-card">
+            <div class="role-emoji">🏬</div>
+            <h3>Aggregator</h3>
+            <p>
+                Coordinate pickups, stock, collection centers
+                and dispatch operations.
+            </p>
+            <a href="/login">Aggregator login →</a>
+        </article>
+
+        <article class="role-card">
+            <div class="role-emoji">⚙️</div>
+            <h3>Pellet Plant</h3>
+            <p>
+                Manage raw materials, pellet production,
+                inventory and quality.
+            </p>
+            <a href="/login">Plant login →</a>
+        </article>
+
+        <article class="role-card">
+            <div class="role-emoji">🏭</div>
+            <h3>Industrial Buyer</h3>
+            <p>
+                Create fuel orders and monitor procurement
+                requirements and deliveries.
+            </p>
+            <a href="/login">Buyer login →</a>
+        </article>
+
+        <article class="role-card">
+            <div class="role-emoji">🚛</div>
+            <h3>Transporter</h3>
+            <p>
+                Manage vehicle details, assigned shipments,
+                transport progress and delivery records.
+            </p>
+            <a href="/login">Transporter login →</a>
+        </article>
+
+        <article class="role-card">
+            <div class="role-emoji">🛡️</div>
+            <h3>Administrator</h3>
+            <p>
+                Oversee accounts, procurement activity,
+                operations and supply-chain reports.
+            </p>
+            <a href="/login">Admin login →</a>
+        </article>
+    </div>
+
+    <div class="roles-note">
+        <strong>Note:</strong> These links open the login page.
+        Authentication and role-based dashboard access must be
+        implemented in your Flask backend.
+    </div>
+</section>
+
+<section class="closing-banner">
+    <div>
+        <div class="section-label">THE BIGGER GOAL</div>
+        <h2>Make biomass logistics work smarter.</h2>
+        <p>
+            Improve coordination between farmers and industries while
+            helping buyers plan reliable, quality-compliant and
+            cost-conscious deliveries.
+        </p>
+    </div>
+
+    <a href="/register" class="gr-button">
+        Get Started ↗
+    </a>
+</section>
+
+{% endblock %}

@@ -1,0 +1,1145 @@
+{% extends "base.html" %}
+
+{% block title %}Farmer Dashboard | GreenRoute{% endblock %}
+
+{% block extra_css %}
+<style>
+    .farmer-dashboard {
+        width: min(1400px, 94%);
+        margin: 30px auto;
+        color: #24372b;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 28px;
+        margin: 0;
+        color: #103e2c;
+    }
+
+    .dashboard-header p {
+        color: #748278;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .farmer-tag {
+        background: #eaf5ec;
+        color: #176b45;
+        border-radius: 25px;
+        padding: 9px 15px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .prototype-notice {
+        background: #fff6dc;
+        border: 1px solid #f0dfac;
+        padding: 13px 16px;
+        border-radius: 9px;
+        color: #755b20;
+        font-size: 12px;
+        margin-bottom: 24px;
+    }
+
+    .toast {
+        display: none;
+        padding: 12px 15px;
+        margin-bottom: 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        background: #e7f5e9;
+        color: #20683a;
+    }
+
+    .toast.error {
+        color: #963f28;
+        background: #fff0e9;
+    }
+
+    .farmer-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e2e9df;
+        border-radius: 13px;
+        padding: 20px;
+        box-shadow: 0 4px 14px #173d2105;
+    }
+
+    .stat-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        color: #748278;
+    }
+
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #eaf5ec;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+    .stat-value {
+        font-size: 27px;
+        font-weight: 800;
+        margin: 12px 0 5px;
+        color: #103e2c;
+    }
+
+    .stat-description {
+        color: #748278;
+        font-size: 11px;
+    }
+
+    .farmer-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .panel {
+        background: white;
+        border: 1px solid #e2e9df;
+        border-radius: 13px;
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+
+    .panel-heading {
+        padding: 19px 21px;
+        border-bottom: 1px solid #e2e9df;
+    }
+
+    .panel-heading h2 {
+        font-size: 17px;
+        margin: 0;
+        color: #103e2c;
+    }
+
+    .panel-heading p {
+        font-size: 12px;
+        color: #748278;
+        margin: 5px 0 0;
+    }
+
+    .panel-body {
+        padding: 21px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .field {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #45594a;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+        display: block;
+        width: 100%;
+        margin-top: 7px;
+        padding: 11px 12px;
+        border: 1px solid #dce5d9;
+        border-radius: 8px;
+        color: #24372b;
+        background: white;
+        font-family: inherit;
+        font-size: 12px;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+        outline: 1px solid #176b45;
+        border-color: #176b45;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        grid-column: 1 / -1;
+    }
+
+    .btn {
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-primary {
+        background: #176b45;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #103e2c;
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #176b45;
+        border-color: #dce5d9;
+    }
+
+    .btn-secondary:hover {
+        background: #eaf5ec;
+    }
+
+    .profile-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 13px 0;
+        border-bottom: 1px solid #edf0eb;
+        font-size: 12px;
+    }
+
+    .profile-item:last-child {
+        border-bottom: none;
+    }
+
+    .profile-item span {
+        color: #748278;
+    }
+
+    .profile-item strong {
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-green {
+        background: #e5f5e9;
+        color: #207147;
+    }
+
+    .status-yellow {
+        background: #fff2d6;
+        color: #88601a;
+    }
+
+    .status-blue {
+        background: #e6efff;
+        color: #285baa;
+    }
+
+    .status-red {
+        background: #ffebe8;
+        color: #a12d28;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        white-space: nowrap;
+    }
+
+    th, td {
+        padding: 13px 15px;
+        text-align: left;
+        border-bottom: 1px solid #edf0eb;
+        font-size: 12px;
+    }
+
+    th {
+        background: #fafbf8;
+        color: #748278;
+        font-weight: 700;
+    }
+
+    td {
+        color: #405047;
+    }
+
+    tbody tr:hover {
+        background: #f8fbf7;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 25px;
+        color: #748278;
+        font-size: 12px;
+    }
+
+    .quality-note {
+        background: #eef7eb;
+        color: #356447;
+        padding: 13px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.7;
+        margin-top: 15px;
+    }
+
+    .footer-note {
+        text-align: center;
+        font-size: 11px;
+        color: #748278;
+        padding: 20px;
+    }
+
+    @media (max-width: 950px) {
+        .farmer-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .farmer-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .farmer-dashboard {
+            width: 94%;
+            margin: 20px auto;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width,
+        .actions {
+            grid-column: auto;
+        }
+
+        .dashboard-header h1 {
+            font-size: 23px;
+        }
+
+        .stat-card {
+            padding: 14px;
+        }
+
+        .stat-value {
+            font-size: 23px;
+        }
+    }
+
+    @media print {
+        .no-print,
+        form,
+        .prototype-notice {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="farmer-dashboard">
+
+    <!-- DASHBOARD HEADER -->
+    <header class="dashboard-header">
+        <div>
+            <h1>Farmer Dashboard</h1>
+            <p>
+                Manage your crop residue, publish biomass availability,
+                and track collection and payment status.
+            </p>
+        </div>
+
+        <span class="farmer-tag">🌾 Farmer Workspace</span>
+
+        <button class="btn btn-secondary no-print"
+                type="button"
+                onclick="window.print()">
+            Print Dashboard
+        </button>
+    </header>
+
+    <div class="prototype-notice">
+        <strong>Prototype mode:</strong>
+        This dashboard stores demonstration entries in this browser.
+        To share farmer listings with aggregators and store records permanently,
+        connect the dashboard to your Flask backend and database.
+    </div>
+
+    <div id="farmerToast" class="toast" role="status"
+         aria-live="polite"></div>
+
+    <!-- SUMMARY CARDS -->
+    <section class="farmer-stats">
+
+        <div class="stat-card">
+            <div class="stat-heading">
+                Available Biomass
+                <span class="stat-icon">🌾</span>
+            </div>
+            <div class="stat-value" id="availableMetric">0 t</div>
+            <div class="stat-description">Biomass available for collection</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-heading">
+                Pickup Requests
+                <span class="stat-icon">📅</span>
+            </div>
+            <div class="stat-value" id="pickupMetric">0</div>
+            <div class="stat-description">Awaiting collection or confirmation</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-heading">
+                Collected Biomass
+                <span class="stat-icon">✅</span>
+            </div>
+            <div class="stat-value" id="collectedMetric">0 t</div>
+            <div class="stat-description">Recorded as collected</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-heading">
+                Recorded Earnings
+                <span class="stat-icon">₹</span>
+            </div>
+            <div class="stat-value" id="earningsMetric">₹0</div>
+            <div class="stat-description">Based on completed demo payments</div>
+        </div>
+
+    </section>
+
+    <!-- PROFILE AND BIOMASS FORM -->
+    <div class="farmer-grid">
+
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>Farmer & Farm Details</h2>
+                <p>Enter your contact details and farm location.</p>
+            </div>
+
+            <div class="panel-body">
+                <form id="farmerProfileForm" class="form-grid">
+
+                    <label class="field">
+                        Farmer Name
+                        <input type="text" id="profileName"
+                               maxlength="100" required
+                               placeholder="Enter your full name">
+                    </label>
+
+                    <label class="field">
+                        Phone Number
+                        <input type="tel" id="profilePhone"
+                               pattern="[0-9]{10}" maxlength="10"
+                               inputmode="numeric" required
+                               placeholder="10-digit mobile number">
+                    </label>
+
+                    <label class="field">
+                        Village
+                        <input type="text" id="profileVillage"
+                               maxlength="100" required
+                               placeholder="Enter village">
+                    </label>
+
+                    <label class="field">
+                        District
+                        <input type="text" id="profileDistrict"
+                               maxlength="100" required
+                               placeholder="Enter district">
+                    </label>
+
+                    <label class="field">
+                        PIN Code
+                        <input type="text" id="profilePincode"
+                               pattern="[0-9]{6}" maxlength="6"
+                               inputmode="numeric" required
+                               placeholder="6-digit PIN code">
+                    </label>
+
+                    <label class="field">
+                        Farm Location / Landmark
+                        <input type="text" id="profileLocation"
+                               maxlength="180" required
+                               placeholder="Farm address or landmark">
+                    </label>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">
+                            Save Farmer Details
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>My Profile Summary</h2>
+                <p>Review your saved farm details.</p>
+            </div>
+
+            <div class="panel-body">
+                <div class="profile-item">
+                    <span>Farmer Name</span>
+                    <strong id="viewName">Not entered</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span>Phone</span>
+                    <strong id="viewPhone">Not entered</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span>Village</span>
+                    <strong id="viewVillage">Not entered</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span>District</span>
+                    <strong id="viewDistrict">Not entered</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span>PIN Code</span>
+                    <strong id="viewPincode">Not entered</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span>Farm Location</span>
+                    <strong id="viewLocation">Not entered</strong>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ADD BIOMASS LISTING -->
+    <section class="panel" id="addBiomass">
+        <div class="panel-heading">
+            <h2>Publish Biomass Availability</h2>
+            <p>
+                Tell aggregators what residue you have, its quantity,
+                moisture level, availability date and expected price.
+            </p>
+        </div>
+
+        <div class="panel-body">
+            <form id="biomassForm" class="form-grid">
+
+                <label class="field">
+                    Crop Residue Type
+                    <select id="residueType" required>
+                        <option value="">Select residue</option>
+                        <option>Rice straw</option>
+                        <option>Wheat straw</option>
+                        <option>Sugarcane residue</option>
+                        <option>Cotton stalks</option>
+                        <option>Groundnut shells</option>
+                        <option>Corn stalks</option>
+                        <option>Other crop residue</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    Available Quantity (tons)
+                    <input type="number" id="biomassQuantity"
+                           min="0.1" max="100000" step="0.1"
+                           required placeholder="Example: 10">
+                </label>
+
+                <label class="field">
+                    Moisture Level (%)
+                    <input type="number" id="moistureLevel"
+                           min="0" max="100" step="0.1"
+                           required placeholder="Example: 12">
+                </label>
+
+                <label class="field">
+                    Expected Price per Ton (₹)
+                    <input type="number" id="expectedPrice"
+                           min="0" max="100000000" step="0.01"
+                           required placeholder="Example: 3500">
+                </label>
+
+                <label class="field">
+                    Biomass Available From
+                    <input type="date" id="availableDate" required>
+                </label>
+
+                <label class="field">
+                    Collection Preference
+                    <select id="collectionPreference" required>
+                        <option value="">Select preference</option>
+                        <option>Farm pickup required</option>
+                        <option>Self-delivery to collection center</option>
+                    </select>
+                </label>
+
+                <label class="field full-width">
+                    Additional Notes
+                    <textarea id="biomassNotes" rows="3" maxlength="500"
+                              placeholder="Quality details, storage condition or pickup information"></textarea>
+                </label>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">
+                        + Publish Biomass Listing
+                    </button>
+
+                    <button type="reset" class="btn btn-secondary">
+                        Clear Form
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="quality-note">
+                <strong>Quality reminder:</strong>
+                Moisture requirements vary between buyers and pellet plants.
+                Enter a measured moisture reading where possible and confirm
+                the buyer's specified limit before supplying biomass.
+            </div>
+        </div>
+    </section>
+
+    <!-- BIOMASS LISTINGS -->
+    <section class="panel" id="myBiomass">
+        <div class="panel-heading">
+            <h2>My Biomass Listings</h2>
+            <p>Review available stock and collection request status.</p>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Listing ID</th>
+                        <th>Residue Type</th>
+                        <th>Quantity</th>
+                        <th>Moisture</th>
+                        <th>Price / Ton</th>
+                        <th>Available From</th>
+                        <th>Pickup Preference</th>
+                        <th>Status</th>
+                        <th class="no-print">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="biomassBody">
+                    <tr>
+                        <td colspan="9" class="empty-message">
+                            No biomass listings recorded.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- COLLECTION TRACKER -->
+    <section class="panel" id="collectionTracking">
+        <div class="panel-heading">
+            <h2>Collection & Aggregator Updates</h2>
+            <p>Track the status of your published biomass listings.</p>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Listing ID</th>
+                        <th>Residue</th>
+                        <th>Quantity</th>
+                        <th>Collection Method</th>
+                        <th>Current Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="collectionTrackingBody">
+                    <tr>
+                        <td colspan="5" class="empty-message">
+                            No collection activity yet.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- PAYMENT HISTORY -->
+    <section class="panel" id="paymentHistory">
+        <div class="panel-heading">
+            <h2>Payment History</h2>
+            <p>Review recorded payment status for collected biomass.</p>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Listing ID</th>
+                        <th>Residue</th>
+                        <th>Quantity</th>
+                        <th>Recorded Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="paymentBody">
+                    <tr>
+                        <td colspan="6" class="empty-message">
+                            No payment records available.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="footer-note">
+        GreenRoute · Farmer Portal · Smart Biomass Procurement
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const FARMER_STORAGE_KEY = "greenroute_farmer_demo_v1";
+
+    const initialFarmerData = {
+        profile: {
+            name: "",
+            phone: "",
+            village: "",
+            district: "",
+            pincode: "",
+            location: ""
+        },
+        listings: [],
+        payments: [],
+        nextListingId: 1001,
+        nextPaymentId: 5001
+    };
+
+    let farmerData;
+
+    try {
+        const savedFarmerData = localStorage.getItem(FARMER_STORAGE_KEY);
+        farmerData = savedFarmerData
+            ? JSON.parse(savedFarmerData)
+            : structuredClone(initialFarmerData);
+
+        if (!farmerData.profile ||
+            !Array.isArray(farmerData.listings) ||
+            !Array.isArray(farmerData.payments)) {
+            farmerData = structuredClone(initialFarmerData);
+        }
+    } catch (error) {
+        farmerData = structuredClone(initialFarmerData);
+    }
+
+    function saveFarmerData() {
+        try {
+            localStorage.setItem(
+                FARMER_STORAGE_KEY,
+                JSON.stringify(farmerData)
+            );
+            return true;
+        } catch (error) {
+            showToast(
+                "Could not save data in browser storage.",
+                true
+            );
+            return false;
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.getElementById("farmerToast");
+        toast.textContent = message;
+        toast.className = "toast" + (isError ? " error" : "");
+        toast.style.display = "block";
+    }
+
+    function formatNumber(value) {
+        return Number(value).toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        });
+    }
+
+    function statusBadge(status) {
+        let cssClass = "status-yellow";
+
+        if (status === "Available" || status === "Collected") {
+            cssClass = "status-green";
+        } else if (status === "Pickup Requested" ||
+                   status === "Pickup Scheduled") {
+            cssClass = "status-blue";
+        } else if (status === "Cancelled") {
+            cssClass = "status-red";
+        }
+
+        return `<span class="status ${cssClass}">${escapeHTML(status)}</span>`;
+    }
+
+    function renderProfile() {
+        const profile = farmerData.profile;
+
+        const fields = {
+            profileName: profile.name,
+            profilePhone: profile.phone,
+            profileVillage: profile.village,
+            profileDistrict: profile.district,
+            profilePincode: profile.pincode,
+            profileLocation: profile.location
+        };
+
+        Object.entries(fields).forEach(([id, value]) => {
+            document.getElementById(id).value = value || "";
+        });
+
+        document.getElementById("viewName").textContent =
+            profile.name || "Not entered";
+        document.getElementById("viewPhone").textContent =
+            profile.phone || "Not entered";
+        document.getElementById("viewVillage").textContent =
+            profile.village || "Not entered";
+        document.getElementById("viewDistrict").textContent =
+            profile.district || "Not entered";
+        document.getElementById("viewPincode").textContent =
+            profile.pincode || "Not entered";
+        document.getElementById("viewLocation").textContent =
+            profile.location || "Not entered";
+    }
+
+    function renderMetrics() {
+        const available = farmerData.listings
+            .filter(item => item.status === "Available")
+            .reduce((sum, item) => sum + item.quantity, 0);
+
+        const pending = farmerData.listings.filter(item =>
+            ["Pickup Requested", "Pickup Scheduled"].includes(item.status)
+        ).length;
+
+        const collected = farmerData.listings
+            .filter(item => item.status === "Collected")
+            .reduce((sum, item) => sum + item.quantity, 0);
+
+        const earnings = farmerData.payments
+            .filter(payment => payment.status === "Paid")
+            .reduce((sum, payment) => sum + payment.amount, 0);
+
+        document.getElementById("availableMetric").textContent =
+            formatNumber(available) + " t";
+
+        document.getElementById("pickupMetric").textContent = pending;
+
+        document.getElementById("collectedMetric").textContent =
+            formatNumber(collected) + " t";
+
+        document.getElementById("earningsMetric").textContent =
+            "₹" + formatNumber(earnings);
+    }
+
+    function renderListings() {
+        const body = document.getElementById("biomassBody");
+
+        if (farmerData.listings.length === 0) {
+            body.innerHTML = `
+                <tr>
+                    <td colspan="9" class="empty-message">
+                        No biomass listings yet. Add your first listing above.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        body.innerHTML = farmerData.listings.map(item => {
+            let action = "";
+
+            if (item.status === "Available") {
+                action = `
+                    <button type="button"
+                            class="btn btn-primary"
+                            data-action="request"
+                            data-id="${escapeHTML(item.id)}">
+                        Request Pickup
+                    </button>`;
+            } else if (item.status === "Pickup Requested") {
+                action = `
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-action="cancel"
+                            data-id="${escapeHTML(item.id)}">
+                        Cancel Request
+                    </button>`;
+            }
+
+            return `
+                <tr>
+                    <td>${escapeHTML(item.id)}</td>
+                    <td>${escapeHTML(item.residue)}</td>
+                    <td>${formatNumber(item.quantity)} t</td>
+                    <td>${formatNumber(item.moisture)}%</td>
+                    <td>₹${formatNumber(item.price)}</td>
+                    <td>${escapeHTML(item.availableDate)}</td>
+                    <td>${escapeHTML(item.preference)}</td>
+                    <td>${statusBadge(item.status)}</td>
+                    <td class="no-print">${action || "—"}</td>
+                </tr>`;
+        }).join("");
+    }
+
+    function renderCollectionTracking() {
+        const body = document.getElementById("collectionTrackingBody");
+
+        const items = farmerData.listings.filter(item =>
+            item.status !== "Available" &&
+            item.status !== "Cancelled"
+        );
+
+        if (items.length === 0) {
+            body.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No collection requests yet.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        body.innerHTML = items.map(item => `
+            <tr>
+                <td>${escapeHTML(item.id)}</td>
+                <td>${escapeHTML(item.residue)}</td>
+                <td>${formatNumber(item.quantity)} t</td>
+                <td>${escapeHTML(item.preference)}</td>
+                <td>${statusBadge(item.status)}</td>
+            </tr>
+        `).join("");
+    }
+
+    function renderPayments() {
+        const body = document.getElementById("paymentBody");
+
+        if (farmerData.payments.length === 0) {
+            body.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-message">
+                        Payment records will appear here when recorded.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        body.innerHTML = farmerData.payments.map(payment => `
+            <tr>
+                <td>${escapeHTML(payment.id)}</td>
+                <td>${escapeHTML(payment.listingId)}</td>
+                <td>${escapeHTML(payment.residue)}</td>
+                <td>${formatNumber(payment.quantity)} t</td>
+                <td>₹${formatNumber(payment.amount)}</td>
+                <td>${statusBadge(payment.status)}</td>
+            </tr>
+        `).join("");
+    }
+
+    function renderAll() {
+        renderProfile();
+        renderMetrics();
+        renderListings();
+        renderCollectionTracking();
+        renderPayments();
+        saveFarmerData();
+    }
+
+    document.getElementById("farmerProfileForm")
+        .addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const phone = document.getElementById("profilePhone")
+                .value.trim();
+            const pincode = document.getElementById("profilePincode")
+                .value.trim();
+
+            if (!/^\d{10}$/.test(phone)) {
+                showToast("Enter a valid 10-digit phone number.", true);
+                return;
+            }
+
+            if (!/^\d{6}$/.test(pincode)) {
+                showToast("Enter a valid 6-digit PIN code.", true);
+                return;
+            }
+
+            farmerData.profile = {
+                name: document.getElementById("profileName").value.trim(),
+                phone: phone,
+                village: document.getElementById("profileVillage")
+                    .value.trim(),
+                district: document.getElementById("profileDistrict")
+                    .value.trim(),
+                pincode: pincode,
+                location: document.getElementById("profileLocation")
+                    .value.trim()
+            };
+
+            renderAll();
+            showToast("Farmer details saved in this browser.");
+        });
+
+    document.getElementById("biomassForm")
+        .addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            if (!farmerData.profile.name ||
+                !farmerData.profile.phone ||
+                !farmerData.profile.pincode) {
+                showToast(
+                    "Save your farmer name, phone number and PIN code first.",
+                    true
+                );
+                document.getElementById("farmerProfileForm").scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+                return;
+            }
+
+            const residue = document.getElementById("residueType").value;
+            const quantity = Number(
+                document.getElementById("biomassQuantity").value
+            );
+            const moisture = Number(
+                document.getElementById("moistureLevel").value
+            );
+            const price = Number(
+                document.getElementById("expectedPrice").value
+            );
+            const availableDate = document.getElementById("availableDate").value;
+            const preference =
+                document.getElementById("collectionPreference").value;
+            const notes = document.getElementById("biomassNotes").value.trim();
+
+            if (!residue || !availableDate || !preference ||
+                !Number.isFinite(quantity) || quantity <= 0 ||
+                !Number.isFinite(moisture) || moisture < 0 || moisture > 100 ||
+                !Number.isFinite(price) || price < 0) {
+                showToast("Enter valid biomass information.", true);
+                return;
+            }
+
+            farmerData.listings.unshift({
+                id: "BIO-" + farmerData.nextListingId++,
+                farmer: farmerData.profile.name,
+                residue,
+                quantity,
+                moisture,
+                price,
+                availableDate,
+                preference,
+                notes,
+                status: "Available"
+            });
+
+            document.getElementById("biomassForm").reset();
+
+            renderAll();
+            showToast("Biomass listing published in the demonstration dashboard.");
+        });
+
+    document.getElementById("biomassBody")
+        .addEventListener("click", function(event) {
+            const button = event.target.closest("button[data-action]");
+            if (!button) return;
+
+            const item = farmerData.listings.find(
+                listing => listing.id === button.dataset.id
+            );
+
+            if (!item) {
+                showToast("Biomass listing not found.", true);
+                return;
+            }
+
+            if (button.dataset.action === "request") {
+                if (item.status !== "Available") return;
+
+                item.status = "Pickup Requested";
+                renderAll();
+
+                showToast(
+                    "Pickup request recorded locally. The aggregator will not receive it until backend integration is added."
+                );
+            }
+
+            if (button.dataset.action === "cancel") {
+                if (item.status !== "Pickup Requested") return;
+
+                item.status = "Available";
+                renderAll();
+
+                showToast("Pickup request cancelled in this browser.");
+            }
+        });
+
+    renderAll();
+</script>
+{% endblock %}

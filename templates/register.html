@@ -1,0 +1,822 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account | GreenRoute{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-page {
+        padding: 40px 5%;
+        background:
+            radial-gradient(ellipse at 10% 0%, #e2f2df, transparent 38%),
+            #f6f8f1;
+    }
+
+    .register-container {
+        max-width: 1050px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr;
+        gap: 30px;
+        align-items: start;
+    }
+
+    .register-intro {
+        padding: 25px 5px;
+        position: sticky;
+        top: 100px;
+    }
+
+    .register-eyebrow {
+        display: inline-block;
+        padding: 9px 13px;
+        border-radius: 30px;
+        background: #e8f5e7;
+        border: 1px solid #d6ead1;
+        color: #176b45;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+    }
+
+    .register-intro h1 {
+        margin: 22px 0 16px;
+        color: #103e2c;
+        font-size: clamp(32px, 4vw, 46px);
+        line-height: 1.15;
+    }
+
+    .register-intro h1 span {
+        color: #176b45;
+    }
+
+    .register-intro p {
+        color: #718077;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+    .register-benefits {
+        display: grid;
+        gap: 16px;
+        margin-top: 25px;
+    }
+
+    .register-benefit {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .benefit-icon {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        background: white;
+        border: 1px solid #e2e9df;
+        border-radius: 12px;
+        font-size: 21px;
+    }
+
+    .register-benefit strong {
+        display: block;
+        font-size: 12px;
+        color: #24372b;
+    }
+
+    .register-benefit small {
+        display: block;
+        margin-top: 4px;
+        color: #718077;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .register-card {
+        min-width: 0;
+        padding: 30px;
+        background: white;
+        border: 1px solid #e3e9e0;
+        border-radius: 17px;
+        box-shadow: 0 18px 55px #173d210d;
+    }
+
+    .register-card-top {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 24px;
+    }
+
+    .register-logo {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        background: #eaf5ec;
+        border-radius: 13px;
+        font-size: 25px;
+    }
+
+    .register-card-top h2 {
+        margin: 0 0 4px;
+        color: #103e2c;
+        font-size: 23px;
+    }
+
+    .register-card-top p {
+        margin: 0;
+        color: #718077;
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .form-section-title {
+        margin: 24px 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e9eee7;
+        color: #176b45;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .register-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+    .register-field {
+        min-width: 0;
+    }
+
+    .register-field.full {
+        grid-column: 1 / -1;
+    }
+
+    .register-field label {
+        display: block;
+        margin-bottom: 7px;
+        color: #405047;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .register-field input,
+    .register-field select,
+    .register-field textarea {
+        width: 100%;
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid #dce5d9;
+        border-radius: 8px;
+        font: inherit;
+        font-size: 12px;
+        color: #24372b;
+        background: white;
+    }
+
+    .register-field textarea {
+        resize: vertical;
+    }
+
+    .register-field input:focus,
+    .register-field select:focus,
+    .register-field textarea:focus {
+        outline: 2px solid #d2ead4;
+        border-color: #176b45;
+    }
+
+    .register-field small {
+        display: block;
+        color: #718077;
+        margin-top: 6px;
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .password-wrap {
+        position: relative;
+    }
+
+    .password-wrap input {
+        padding-right: 65px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: #176b45;
+        font-size: 10px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .role-explanation {
+        display: block;
+        margin-top: 9px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #eef7eb;
+        color: #4b6652;
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .role-fields {
+        display: none;
+    }
+
+    .role-fields.visible {
+        display: block;
+    }
+
+    .password-strength {
+        margin-top: 7px;
+        color: #718077;
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .terms-row {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-top: 5px;
+        color: #718077;
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .terms-row input {
+        margin-top: 4px;
+        width: auto;
+        accent-color: #176b45;
+        flex-shrink: 0;
+    }
+
+    .terms-row a,
+    .login-link {
+        color: #176b45;
+        font-weight: 800;
+    }
+
+    .register-submit {
+        grid-column: 1 / -1;
+        width: 100%;
+        padding: 14px;
+        background: #176b45;
+        border: 0;
+        border-radius: 9px;
+        color: white;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .register-submit:hover {
+        background: #103e2c;
+    }
+
+    .register-submit:disabled {
+        opacity: .65;
+        cursor: not-allowed;
+    }
+
+    .login-prompt {
+        margin-top: 22px;
+        padding-top: 20px;
+        border-top: 1px solid #e9eee7;
+        color: #718077;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .register-security {
+        margin-top: 17px;
+        color: #829086;
+        text-align: center;
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    @media (max-width: 850px) {
+        .register-container {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .register-intro {
+            position: static;
+            padding: 8px 0;
+        }
+
+        .register-benefits {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 550px) {
+        .register-page {
+            padding: 25px 4%;
+        }
+
+        .register-card {
+            padding: 21px 17px;
+        }
+
+        .register-grid,
+        .register-benefits {
+            grid-template-columns: 1fr;
+        }
+
+        .register-field.full,
+        .terms-row,
+        .register-submit {
+            grid-column: 1 / -1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="register-page">
+    <div class="register-container">
+
+        <section class="register-intro">
+            <div class="register-eyebrow">
+                JOIN THE BIOMASS NETWORK
+            </div>
+
+            <h1>
+                Let's build a
+                <span>greener supply chain.</span>
+            </h1>
+
+            <p>
+                Join GreenRoute to coordinate agricultural residue,
+                manage collection centres, produce biomass pellets,
+                and improve industrial fuel delivery.
+            </p>
+
+            <div class="register-benefits">
+                <div class="register-benefit">
+                    <div class="benefit-icon">🌾</div>
+                    <div>
+                        <strong>Farmers</strong>
+                        <small>Register crop residue and availability.</small>
+                    </div>
+                </div>
+
+                <div class="register-benefit">
+                    <div class="benefit-icon">🏬</div>
+                    <div>
+                        <strong>Aggregators and Plants</strong>
+                        <small>Manage collection, stock and production.</small>
+                    </div>
+                </div>
+
+                <div class="register-benefit">
+                    <div class="benefit-icon">🏭</div>
+                    <div>
+                        <strong>Industrial Buyers</strong>
+                        <small>Coordinate orders and deliveries.</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="register-card">
+            <div class="register-card-top">
+                <div class="register-logo">🌱</div>
+                <div>
+                    <h2>Create Your Account</h2>
+                    <p>Enter your details to get started with GreenRoute.</p>
+                </div>
+            </div>
+
+            <form id="registerForm"
+                  method="POST"
+                  action="{{ url_for('auth.register') }}">
+
+                <div class="form-section-title">Account Information</div>
+
+                <div class="register-grid">
+
+                    <div class="register-field full">
+                        <label for="role">I want to register as *</label>
+
+                        <select id="role" name="role" required>
+                            <option value="">Select your role</option>
+                            <option value="farmer">🌾 Farmer</option>
+                            <option value="aggregator">🏬 Aggregator</option>
+                            <option value="plant">⚙️ Pellet Plant Operator</option>
+                            <option value="industry">🏭 Industrial Buyer</option>
+                            <option value="transporter">🚚 Transporter / Driver</option>
+                        </select>
+
+                        <div class="role-explanation"
+                             id="roleExplanation"
+                             aria-live="polite">
+                            Select a role to see its description.
+                        </div>
+                    </div>
+
+                    <div class="register-field">
+                        <label for="name">Full Name *</label>
+                        <input type="text"
+                               id="name"
+                               name="name"
+                               maxlength="100"
+                               autocomplete="name"
+                               required
+                               placeholder="Enter your full name">
+                    </div>
+
+                    <div class="register-field">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel"
+                               id="phone"
+                               name="phone"
+                               pattern="[0-9]{10}"
+                               maxlength="10"
+                               inputmode="numeric"
+                               autocomplete="tel"
+                               required
+                               placeholder="10-digit mobile number">
+                    </div>
+
+                    <div class="register-field full">
+                        <label for="email">Email Address *</label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               maxlength="254"
+                               autocomplete="email"
+                               required
+                               placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Location Information</div>
+
+                <div class="register-grid">
+                    <div class="register-field">
+                        <label for="pincode">PIN Code *</label>
+                        <input type="text"
+                               id="pincode"
+                               name="pincode"
+                               inputmode="numeric"
+                               pattern="[0-9]{6}"
+                               maxlength="6"
+                               required
+                               placeholder="641402">
+                        <small>Used for location-based collection planning.</small>
+                    </div>
+
+                    <div class="register-field">
+                        <label for="district">District *</label>
+                        <input type="text"
+                               id="district"
+                               name="district"
+                               maxlength="100"
+                               required
+                               placeholder="e.g. Coimbatore">
+                    </div>
+
+                    <div class="register-field full">
+                        <label for="address">Village / Full Address *</label>
+                        <textarea id="address"
+                                  name="address"
+                                  rows="2"
+                                  maxlength="500"
+                                  required
+                                  placeholder="Enter village, town and address"></textarea>
+                    </div>
+                </div>
+
+                <!-- Organization details -->
+                <div id="businessFields" class="role-fields">
+                    <div class="form-section-title">Organization Information</div>
+
+                    <div class="register-grid">
+                        <div class="register-field full">
+                            <label for="organization" id="organizationLabel">
+                                Organization Name *
+                            </label>
+
+                            <input type="text"
+                                   id="organization"
+                                   name="organization"
+                                   maxlength="150"
+                                   placeholder="Enter organization name"
+                                   disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pellet plant details -->
+                <div id="plantFields" class="role-fields">
+                    <div class="form-section-title">Pellet Plant Information</div>
+
+                    <div class="register-grid">
+                        <div class="register-field">
+                            <label for="processing_capacity">
+                                Daily Processing Capacity (tons) *
+                            </label>
+
+                            <input type="number"
+                                   id="processing_capacity"
+                                   name="capacity"
+                                   min="0.1"
+                                   max="100000"
+                                   step="0.1"
+                                   placeholder="e.g. 50"
+                                   disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transporter details -->
+                <div id="transporterFields" class="role-fields">
+                    <div class="form-section-title">Transport Information</div>
+
+                    <div class="register-grid">
+                        <div class="register-field">
+                            <label for="vehicle_number">
+                                Vehicle Registration Number *
+                            </label>
+
+                            <input type="text"
+                                   id="vehicle_number"
+                                   name="vehicle_number"
+                                   maxlength="30"
+                                   placeholder="e.g. TN-37-AB-1234"
+                                   disabled>
+                        </div>
+
+                        <div class="register-field">
+                            <label for="vehicle_capacity">
+                                Vehicle Capacity (tons) *
+                            </label>
+
+                            <input type="number"
+                                   id="vehicle_capacity"
+                                   name="capacity"
+                                   min="0.1"
+                                   max="1000"
+                                   step="0.1"
+                                   placeholder="e.g. 20"
+                                   disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-title">Security</div>
+
+                <div class="register-grid">
+                    <div class="register-field">
+                        <label for="password">Create Password *</label>
+
+                        <div class="password-wrap">
+                            <input type="password"
+                                   id="password"
+                                   name="password"
+                                   minlength="8"
+                                   maxlength="128"
+                                   autocomplete="new-password"
+                                   required
+                                   placeholder="At least 8 characters">
+
+                            <button type="button"
+                                    class="password-toggle"
+                                    data-target="password"
+                                    aria-controls="password"
+                                    aria-pressed="false">
+                                Show
+                            </button>
+                        </div>
+
+                        <div class="password-strength" id="passwordStrength">
+                            Use at least 8 characters.
+                        </div>
+                    </div>
+
+                    <div class="register-field">
+                        <label for="confirm_password">Confirm Password *</label>
+
+                        <div class="password-wrap">
+                            <input type="password"
+                                   id="confirm_password"
+                                   name="confirm_password"
+                                   minlength="8"
+                                   maxlength="128"
+                                   autocomplete="new-password"
+                                   required
+                                   placeholder="Enter password again">
+
+                            <button type="button"
+                                    class="password-toggle"
+                                    data-target="confirm_password"
+                                    aria-controls="confirm_password"
+                                    aria-pressed="false">
+                                Show
+                            </button>
+                        </div>
+                    </div>
+
+                    <label class="terms-row">
+                        <input type="checkbox"
+                               id="terms"
+                               name="terms"
+                               value="accepted"
+                               required>
+
+                        <span>
+                            I confirm that the information entered is accurate.
+                            I agree to the platform's
+                            <a href="/terms">Terms of Use</a> and
+                            <a href="/privacy">Privacy Policy</a>.
+                        </span>
+                    </label>
+
+                    <button class="register-submit" type="submit" id="registerSubmit">
+                        Create GreenRoute Account →
+                    </button>
+                </div>
+            </form>
+
+            <div class="login-prompt">
+                Already registered?
+                <a class="login-link"
+                   href="{{ url_for('auth.login') }}">
+                    Sign In Here
+                </a>
+            </div>
+
+            <div class="register-security">
+                🔒 Passwords should be hashed and stored securely by the server.
+            </div>
+        </section>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const role = document.getElementById("role");
+    const explanation = document.getElementById("roleExplanation");
+
+    const businessFields = document.getElementById("businessFields");
+    const plantFields = document.getElementById("plantFields");
+    const transporterFields = document.getElementById("transporterFields");
+
+    const organization = document.getElementById("organization");
+    const organizationLabel = document.getElementById("organizationLabel");
+    const processingCapacity = document.getElementById("processing_capacity");
+    const vehicleNumber = document.getElementById("vehicle_number");
+    const vehicleCapacity = document.getElementById("vehicle_capacity");
+
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirm_password");
+    const form = document.getElementById("registerForm");
+    const submitButton = document.getElementById("registerSubmit");
+
+    const roleDescriptions = {
+        farmer:
+            "Register agricultural residue, harvest dates and availability.",
+        aggregator:
+            "Manage residue collection, collection-centre stock and pickups.",
+        plant:
+            "Manage raw materials, pellet production, stock and quality.",
+        industry:
+            "Place biomass pellet orders and specify delivery requirements.",
+        transporter:
+            "Manage vehicle details, shipments and delivery confirmations."
+    };
+
+    function setFieldGroup(group, visible) {
+        group.classList.toggle("visible", visible);
+
+        group.querySelectorAll("input, select, textarea").forEach(field => {
+            field.disabled = !visible;
+        });
+    }
+
+    function updateRoleFields() {
+        const selectedRole = role.value;
+
+        explanation.textContent =
+            roleDescriptions[selectedRole] ||
+            "Select your role to see its description.";
+
+        const isBusiness = [
+            "aggregator",
+            "plant",
+            "industry"
+        ].includes(selectedRole);
+
+        setFieldGroup(businessFields, isBusiness);
+        setFieldGroup(plantFields, selectedRole === "plant");
+        setFieldGroup(transporterFields, selectedRole === "transporter");
+
+        const labels = {
+            aggregator: "Aggregator / Business Name *",
+            plant: "Pellet Plant Name *",
+            industry: "Company / Factory Name *"
+        };
+
+        organization.required = isBusiness;
+
+        organizationLabel.textContent =
+            labels[selectedRole] || "Organization Name";
+
+        organization.placeholder = isBusiness
+            ? "Enter " + labels[selectedRole].replace(" *", "").toLowerCase()
+            : "Enter organization name";
+
+        processingCapacity.required = selectedRole === "plant";
+        vehicleNumber.required = selectedRole === "transporter";
+        vehicleCapacity.required = selectedRole === "transporter";
+    }
+
+    role.addEventListener("change", updateRoleFields);
+    updateRoleFields();
+
+    // Show and hide passwords.
+    document.querySelectorAll(".password-toggle").forEach(button => {
+        button.addEventListener("click", function () {
+            const input = document.getElementById(button.dataset.target);
+            if (!input) return;
+
+            const show = input.type === "password";
+
+            input.type = show ? "text" : "password";
+            button.textContent = show ? "Hide" : "Show";
+            button.setAttribute("aria-pressed", String(show));
+        });
+    });
+
+    // Password guidance.
+    function checkPasswordStrength() {
+        const value = password.value;
+        const result = document.getElementById("passwordStrength");
+
+        if (!value) {
+            result.textContent = "Use at least 8 characters.";
+        } else if (value.length < 8) {
+            result.textContent = "Too short — use at least 8 characters.";
+        } else if (/^[a-zA-Z]+$/.test(value) || /^[0-9]+$/.test(value)) {
+            result.textContent = "Consider using a mix of letters, numbers and symbols.";
+        } else {
+            result.textContent = "Password length looks good.";
+        }
+    }
+
+    password.addEventListener("input", checkPasswordStrength);
+
+    // Client-side checks. The backend must validate data again.
+    form.addEventListener("submit", function (event) {
+        if (password.value !== confirmPassword.value) {
+            event.preventDefault();
+            alert("Passwords do not match.");
+            confirmPassword.focus();
+            return;
+        }
+
+        if (!/^[0-9]{10}$/.test(
+            document.getElementById("phone").value.trim()
+        )) {
+            event.preventDefault();
+            alert("Enter a valid 10-digit phone number.");
+            return;
+        }
+
+        if (!/^[0-9]{6}$/.test(
+            document.getElementById("pincode").value.trim()
+        )) {
+            event.preventDefault();
+            alert("Enter a valid six-digit PIN code.");
+            return;
+        }
+
+        if (!form.reportValidity()) {
+            event.preventDefault();
+            return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Creating Account...";
+    });
+});
+</script>
+{% endblock %}
